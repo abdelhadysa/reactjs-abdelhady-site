@@ -27,8 +27,6 @@ import App from '../../src/client/components/App'
 
 import apiRouter from './routes/apiRouter'
 
-import dbInstance from './utils/mysql'
-
 /* Middleware */
 
 import errorHandler from './middleware/errorHandler'
