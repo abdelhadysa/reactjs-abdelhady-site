@@ -1,0 +1,23 @@
+/*
+    reactjs-abdelhady-site project created and maintained by Abdelhady "H2O" Salah.
+    (c) 2022 Abdelhady Salah <hadysalah1455@gmail.com> (https://github.com/h2o-creator/reactjs-abdelhady-site)
+    All Rights Reserved.
+    Licensed under the GNU GPL v3 License.
+    License file is included in the root directory and has the name "LICENSE"
+*/
+
+$theme-colors: (
+    "primary": rgb(88, 155, 231),
+    "secondary": rgb(37, 37, 37),
+    "text": rgb(80, 80, 80),
+);
+
+$font-stack:  Roboto, Arial, sans-serif;
+
+/* Include bootstrap */
+@import "~bootstrap/scss/bootstrap";
+
+body {
+    font: 400 12px/1.5 $font-stack;
+    color: map-get($theme-colors, "text");
+}
