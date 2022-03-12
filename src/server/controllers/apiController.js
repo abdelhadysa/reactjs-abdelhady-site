@@ -12,4 +12,4 @@ const apiController = (req, res) => {
     res.status(200).send('Welcome to the API!')
 }
 
-module.exports = apiController
+export default apiController

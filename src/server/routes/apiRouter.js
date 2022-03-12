@@ -8,10 +8,10 @@
 
 const path = require('path')
 const express = require('express')
-const apiController = require('../controllers/apiController')
+import apiController from '../controllers/apiController'
 
 const apiRouter = express.Router()
 
 apiRouter.get('/', apiController)
 
-module.exports = apiRouter
+export default apiRouter

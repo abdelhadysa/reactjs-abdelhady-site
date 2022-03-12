@@ -15,4 +15,4 @@ class httpException extends Error {
     }
 }
 
-module.exports = httpException
+export default httpException

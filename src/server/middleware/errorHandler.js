@@ -8,7 +8,7 @@
 
 // Ref: https://scoutapm.com/blog/express-error-handling
 
-module.exports = function errorHandler(err, req, res, next) {
+export default function errorHandler(err, req, res, next) {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
     console.error('\x1b[31m', err)
     console.log('\x1b[31m', `URL: ${req.originalUrl}`)
