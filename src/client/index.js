@@ -11,6 +11,11 @@ import ReactDOM from 'react-dom'
 import App from 'Components/App'
 import 'Styles/main.scss'
 
+const titleElement = document.createElement('title')
+const headElement = document.querySelector('head')
+titleElement.textContent = process.env.WEBSITE_NAME
+headElement.appendChild(titleElement)
+
 ReactDOM.render(
     <React.StrictMode>
         <App />
