@@ -14,9 +14,10 @@ const TerserPlugin = require('terser-webpack-plugin')
 const CSSMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const WorkboxPlugin = require('workbox-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const nodeExternals = require('webpack-node-externals')
 require('dotenv').config({ path: './.env' }); 
 
-module.exports = {
+const clientConfig = {
     entry: path.resolve(__dirname, 'src/client/index.js'),
     output: {
         libraryTarget: 'var',
@@ -86,3 +87,47 @@ module.exports = {
         minimizer: [new TerserPlugin(), new CSSMinimizerPlugin()],
     }
 }
+
+const serverConfig = {
+    entry: './src/server/index.js',
+    output: {
+        filename: 'index.js',
+        path: path.join(__dirname, 'dist'),
+    },
+    module: {
+        rules: [
+            {
+                loader: 'babel-loader',
+                test: /\.js$/,
+                exclude: /node_modules/,
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/i,
+                include: path.resolve(__dirname, 'src'),
+                use: 
+                {
+                    loader: 'file-loader',
+                    options: {
+                        name: 'img/[folder]/[name].[ext]',
+                    },
+                },
+            },
+        ],
+    },
+    target: 'node',
+    externals: [nodeExternals()],
+    node: {
+        __dirname: false,
+    },
+    resolve: {
+        alias: {
+            Resources: path.resolve(__dirname, 'src/client/resources'),
+            Components: path.resolve(__dirname, 'src/client/components'),
+            Styles: path.resolve(__dirname, 'src/client/styles'),
+            Views: path.resolve(__dirname, 'src/client/views'),
+            Client: path.resolve(__dirname, 'src/client'),
+        }
+    },
+}
+
+module.exports = [clientConfig, serverConfig]
