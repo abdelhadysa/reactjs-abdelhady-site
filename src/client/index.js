@@ -16,7 +16,7 @@ const headElement = document.querySelector('head')
 titleElement.textContent = process.env.WEBSITE_NAME
 headElement.appendChild(titleElement)
 
-ReactDOM.render(
+ReactDOM.hydrate(
     <React.StrictMode>
         <App />
     </React.StrictMode>,

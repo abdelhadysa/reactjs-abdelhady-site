@@ -15,19 +15,28 @@ const morgan = require('morgan')
 const helmet = require('helmet')
 const rateLimit = require('express-rate-limit')
 const device = require('express-device')
+const fs = require('fs')
+const React = require('react')
+const ReactDOMServer = require('react-dom/server')
+
+/* SSR */
+
+import App from '../../src/client/components/App'
 
 /* Routes */
 
-const apiRouter = require('./routes/apiRouter')
+import apiRouter from './routes/apiRouter'
+
+import dbInstance from './utils/mysql'
 
 /* Middleware */
 
-const errorHandler = require('./middleware/errorHandler')
-const errorResponder = require('./middleware/errorResponder')
+import errorHandler from './middleware/errorHandler'
+import errorResponder from './middleware/errorResponder'
 
 /* Errors */
 
-const httpException = require('./utils/httpException')
+import httpException from './utils/httpException'
 
 /* Load Env */
 
@@ -70,10 +79,16 @@ app
     .use(limiter)
     .use(bodyParser.urlencoded({ extended: true }))
     .use(bodyParser.json())
-    .use(express.static('dist'))
+    .use(express.static(path.resolve('dist')))
     .use(device.capture())
     .use('/api', apiRouter)
-    .get('*', (_req, res) => res.status(200).sendFile(path.join(__dirname, '../../../dist/index.html')))
+    .get('*', (_req, res, next) => {
+        fs.readFile(path.resolve('dist/index.html'), "utf8", (err, data) => {
+            if (err) return next(new httpException(500, err))
+            return res.status(200).send(data.replace('<div id="root"></div>',
+            `<div id="root">${ReactDOMServer.renderToString(<App />)}</div>`))
+        })
+    })
     .use(errorHandler)
     .use(errorResponder)
     .listen(process.env.EXPRESS_PORT, () => {
