@@ -6,11 +6,12 @@
     License file is included in the root directory and has the name "LICENSE"
 */
 
-const mysql = require('mysql')
+const mysql = require('mysql2')
 const dotenv = require('dotenv')
 dotenv.config();
 
 const pool = mysql.createPool({
+    connectionLimit : 100,
     host: process.env.MYSQL_HOST,
     port: process.env.MYSQL_PORT,
     user: process.env.MYSQL_USER,
@@ -18,4 +19,4 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DB
 })
 
-module.exports = pool.promise()
+export default pool.promise()
