@@ -6,10 +6,11 @@
     License file is included in the root directory and has the name "LICENSE"
 */
 
-import React from 'react'
+import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom'
 import App from 'Components/App'
 import 'Styles/main.scss'
+import './i18n'
 
 const titleElement = document.createElement('title')
 const headElement = document.querySelector('head')
@@ -18,7 +19,9 @@ headElement.appendChild(titleElement)
 
 ReactDOM.hydrate(
     <React.StrictMode>
-        <App />
+        <Suspense fallback=''>
+            <App />
+        </Suspense>
     </React.StrictMode>,
     document.querySelector('#root')
 )
