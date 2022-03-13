@@ -1,0 +1,9 @@
+{
+    "notice": "(c) {{date}} {{websiteName}}. All Rights Reserved.",
+    "greetings": {
+        "greeting_morning": "Good morning! The date and time now is {{date, DATETIME_HUGE}}",
+        "greeting_afternoon": "Good afternoon! The date and time now is {{date, DATETIME_HUGE}}",
+        "greeting_evening": "Good evening! The date and time now is {{date, DATETIME_HUGE}}",
+        "greeting_night": "Sweet dreams! The date and time now is {{date, DATETIME_HUGE}}"
+    }
+}
