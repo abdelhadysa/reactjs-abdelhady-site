@@ -40,6 +40,11 @@ import httpException from './utils/httpException'
 
 dotenv.config()
 
+/* PG Sequelize */
+// Ref: https://www.robinwieruch.de/postgres-express-setup-tutorial/
+
+import { sequelize } from 'Database/sequelize-models'
+
 /* Whitelist */
 
 // Ref: https://blog.logrocket.com/express-middleware-a-complete-guide/
@@ -89,9 +94,13 @@ app
     })
     .use(errorHandler)
     .use(errorResponder)
-    .listen(process.env.EXPRESS_PORT, () => {
+
+// Connect to the database then start application
+sequelize.authenticate().then(async () => {
+    app.listen(process.env.EXPRESS_PORT, () => {
         console.log('\x1b[33m%s\x1b[0m', '|=========================================================|')
         console.log('\x1b[30m%s\x1b[0m', `|==================[${process.env.WEBSITE_NAME}]==================|`)
         console.log('\x1b[36m%s\x1b[0m', `|====================[localhost: ${process.env.EXPRESS_PORT}]====================|`)
         console.log('\x1b[33m%s\x1b[0m', '|=========================================================|')
     })
+})
