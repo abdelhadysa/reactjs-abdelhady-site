@@ -8,14 +8,14 @@
 
 const path = require('path')
 const express = require('express')
-import apiController from '../controllers/apiController'
-import userRouter from './userRouter'
-import messageRouter from './messageRouter'
+import * as messageController from '../controllers/messageController'
 
-const apiRouter = express.Router()
+const messageRouter = express.Router()
 
-apiRouter.use('/user', userRouter)
-apiRouter.use('/message', messageRouter)
-apiRouter.get('/', apiController)
+messageRouter.post('/', messageController.createOne)
+messageRouter.get('/:id', messageController.getOne)
+messageRouter.get('/', messageController.getAll)
+messageRouter.put('/:id', messageController.updateOne)
+messageRouter.delete('/:id', messageController.deleteOne)
 
-export default apiRouter
+export default messageRouter
