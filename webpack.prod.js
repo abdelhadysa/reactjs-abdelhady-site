@@ -23,6 +23,7 @@ const clientConfig = {
         libraryTarget: 'var',
         library: 'Client',
         filename: 'js/bundle.js',
+        path: path.join(__dirname, 'dist'),
     },
     resolve: {
         alias: {
@@ -126,6 +127,7 @@ const serverConfig = {
             Styles: path.resolve(__dirname, 'src/client/styles'),
             Views: path.resolve(__dirname, 'src/client/views'),
             Client: path.resolve(__dirname, 'src/client'),
+            Database: path.resolve(__dirname, 'src/db'),
         }
     },
 }

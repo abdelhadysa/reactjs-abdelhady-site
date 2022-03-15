@@ -20,6 +20,7 @@ const clientConfig = {
         libraryTarget: 'var',
         library: 'Client',
         filename: 'js/bundle.js',
+        path: path.join(__dirname, 'dist'),
     },
     resolve: {
         alias: {
@@ -32,7 +33,7 @@ const clientConfig = {
     },
     mode: 'development',
     devtool: 'source-map',
-    stats: 'info',
+    stats: 'detailed',
     module: {
         rules: [
             {
@@ -66,12 +67,12 @@ const clientConfig = {
             template: path.resolve(__dirname, 'src/client/views/index.html'),
             filename: 'index.html'
         }),
-        new CleanWebpackPlugin({
-            dry: true,
+        /*new CleanWebpackPlugin({
+            dry: false,
             verbose: true,
             cleanStaleWebpackAssets: true,
             protectedWebpackAssets: false,
-        }),
+        }),*/
         new webpack.DefinePlugin({
             'process.env': JSON.stringify(process.env)
         }),
@@ -129,6 +130,7 @@ const serverConfig = {
             Styles: path.resolve(__dirname, 'src/client/styles'),
             Views: path.resolve(__dirname, 'src/client/views'),
             Client: path.resolve(__dirname, 'src/client'),
+            Database: path.resolve(__dirname, 'src/db'),
         }
     },
 }
