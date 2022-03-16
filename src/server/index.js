@@ -18,6 +18,7 @@ const device = require('express-device')
 const fs = require('fs')
 const React = require('react')
 const ReactDOMServer = require('react-dom/server')
+const cookieParser = require('cookie-parser')
 
 /* SSR */
 
@@ -82,6 +83,11 @@ app
     .use(limiter)
     .use(bodyParser.urlencoded({ extended: true }))
     .use(bodyParser.json())
+    .use(cookieParser(process.env.COOKIEPARSER_SECRET, {
+        httpOnly: true,
+        maxAge: process.env.COOKIE_MAXAGE,
+        sameSite: true,
+    }))
     .use(express.static(path.resolve('dist')))
     .use(device.capture())
     .use('/api', apiRouter)
