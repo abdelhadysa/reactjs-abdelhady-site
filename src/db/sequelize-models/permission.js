@@ -1,25 +1,24 @@
 'use strict';
 import { Model } from 'sequelize'
-const userModel = (sequelize, DataTypes) => {
-	class User extends Model {
+const permissionModel = (sequelize, DataTypes) => {
+	class Permission extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			User.hasMany(models.Message, { onDelete: 'CASCADE', foreignKey: { allowNull: false, name: 'UserUuid' } })
-			User.belongsToMany(models.Role, { through: models.UserRoles })
+			Permission.belongsToMany(models.Role, { through: models.RolePermissions })
 		}
 	}
-	User.init({
+	Permission.init({
 		Uuid: {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
 			allowNull: false,
 		},
-		Username: {
+		Name: {
 			type: DataTypes.STRING,
 			unique: true,
 			allowNull: false,
@@ -27,9 +26,12 @@ const userModel = (sequelize, DataTypes) => {
 				notEmpty: true,
 			},
 		},
+		Description: {
+			type: DataTypes.STRING
+		},
 	}, {
 		sequelize,
-		modelName: 'User',
+		modelName: 'Permission',
 		scopes: {
 			hideSensitive: {
 				attributes: {
@@ -40,7 +42,7 @@ const userModel = (sequelize, DataTypes) => {
 		createdAt: 'CreatedAt',
 		updatedAt: 'UpdatedAt',
 	});
-	return User;
+	return Permission;
 };
 
-export default userModel
+export default permissionModel

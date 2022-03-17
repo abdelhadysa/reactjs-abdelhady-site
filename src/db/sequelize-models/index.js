@@ -9,6 +9,10 @@ const config = require('../sequelize-config/config.js')[env];
 
 import userModel from './user'
 import messageModel from './message'
+import roleModel from './role'
+import permissionModel from './permission'
+import userRolesModel from './userroles'
+import rolePermissionsModel from './rolepermissions'
 
 let sequelize;
 if (config.use_env_variable) {
@@ -20,6 +24,10 @@ if (config.use_env_variable) {
 const models = {
 	User: userModel(sequelize, Sequelize.DataTypes),
 	Message: messageModel(sequelize, Sequelize.DataTypes),
+	Role: roleModel(sequelize, Sequelize.DataTypes),
+	Permission: permissionModel(sequelize, Sequelize.DataTypes),
+	UserRoles: userRolesModel(sequelize, Sequelize.DataTypes),
+	RolePermissions: rolePermissionsModel(sequelize, Sequelize.DataTypes),
 };
 
 //require.context(__dirname, false, /^((?!index).)*\.js$/)

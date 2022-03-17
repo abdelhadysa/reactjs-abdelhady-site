@@ -1,7 +1,5 @@
 'use strict';
-const {
-	Model
-} = require('sequelize');
+import { Model } from 'sequelize'
 const messageModel = (sequelize, DataTypes) => {
 	class Message extends Model {
 		/**
@@ -10,30 +8,35 @@ const messageModel = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Message.belongsTo(models.User)
+			Message.belongsTo(models.User, { foreignKey: { allowNull: false } })
 		}
 	}
 	Message.init({
-		uuid: {
+		Uuid: {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
+			allowNull: false,
 		},
-		title: {
+		Title: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
 				notEmpty: true,
 			},
 		},
-		text: {
+		Text: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
 				notEmpty: true,
 			},
 		},
-		userUuid: DataTypes.UUID,
+		UserUuid: {
+			type: DataTypes.UUID,
+			allowNull: false,
+			onDelete: 'CASCADE',
+		},
 	}, {
 		sequelize,
 		modelName: 'Message',
@@ -44,6 +47,8 @@ const messageModel = (sequelize, DataTypes) => {
 				},
 			},
 		},
+		createdAt: 'CreatedAt',
+		updatedAt: 'UpdatedAt',
 	});
 	return Message;
 };

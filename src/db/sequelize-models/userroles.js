@@ -1,35 +1,34 @@
 'use strict';
 import { Model } from 'sequelize'
-const userModel = (sequelize, DataTypes) => {
-	class User extends Model {
+const userRolesModel = (sequelize, DataTypes) => {
+	class UserRoles extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			User.hasMany(models.Message, { onDelete: 'CASCADE', foreignKey: { allowNull: false, name: 'UserUuid' } })
-			User.belongsToMany(models.Role, { through: models.UserRoles })
+			// define association here
 		}
 	}
-	User.init({
+	UserRoles.init({
 		Uuid: {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
 			allowNull: false,
 		},
-		Username: {
-			type: DataTypes.STRING,
-			unique: true,
+		UserUuid: {
+			type: DataTypes.UUID,
 			allowNull: false,
-			validate: {
-				notEmpty: true,
-			},
+		},
+		RoleUuid: {
+			type: DataTypes.UUID,
+			allowNull: false,
 		},
 	}, {
 		sequelize,
-		modelName: 'User',
+		modelName: 'UserRoles',
 		scopes: {
 			hideSensitive: {
 				attributes: {
@@ -40,7 +39,7 @@ const userModel = (sequelize, DataTypes) => {
 		createdAt: 'CreatedAt',
 		updatedAt: 'UpdatedAt',
 	});
-	return User;
+	return UserRoles;
 };
 
-export default userModel
+export default userRolesModel
