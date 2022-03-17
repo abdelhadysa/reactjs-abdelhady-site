@@ -18,7 +18,7 @@ const getOne = async (req, res, next) => {
     try {
         const message = await Message.scope('hideSensitive').findAll({
             where: {
-                uuid: {
+                Uuid: {
                     [Op.eq]: req.params.id,
                 },
             },
@@ -52,9 +52,9 @@ const createOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
     try {
-        const message = await Message.scope('hideSensitive').update({
+        const message = await Message.scope('hideSensitive').update(req.body, {
             where: {
-                uuid: {
+                Uuid: {
                     [Op.eq]: req.params.id,
                 },
             },
@@ -69,7 +69,7 @@ const deleteOne = async (req, res, next) => {
     try {
         const message = await Message.scope('hideSensitive').destroy({
             where: {
-                uuid: {
+                Uuid: {
                     [Op.eq]: req.params.id,
                 },
             },

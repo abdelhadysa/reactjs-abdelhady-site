@@ -13,17 +13,17 @@ import { Op } from 'sequelize'
 import httpException from '../utils/httpException'
 import isUuid from '../utils/isUuid'
 
-const { User, Message, Role } = models
+const { Role, Permission } = models
 
 const getOne = async (req, res, next) => {
     try {
-        const user = await User.scope('hideSensitive').findAll({
+        const role = await Role.scope('hideSensitive').findAll({
             where: {
-                [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
+                [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },
-            include: [Message, Role],
+            include: [Permission],
         })
-        res.status(200).json(user)
+        res.status(200).json(role)
     } catch (e) {
         next(new httpException(500, e))
     }
@@ -31,8 +31,8 @@ const getOne = async (req, res, next) => {
 
 const getAll = async (_req, res, next) => {
     try {
-        const users = await User.scope('hideSensitive').findAll()
-        res.status(200).json(users)
+        const roles = await Role.scope('hideSensitive').findAll()
+        res.status(200).json(roles)
     } catch (e) {
         next(new httpException(500, e))
     }
@@ -40,10 +40,10 @@ const getAll = async (_req, res, next) => {
 
 const createOne = async (req, res, next) => {
     try {
-        const user = await User.scope('hideSensitive').create(req.body, {
-            include: [Message, Role],
+        const role = await Role.scope('hideSensitive').create(req.body, {
+            include: [Permission],
         })
-        res.status(200).json(user)
+        res.status(200).json(role)
     } catch (e) {
         next(new httpException(500, e))
     }
@@ -51,12 +51,12 @@ const createOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
     try {
-        const user = await User.scope('hideSensitive').update(req.body, {
+        const role = await Role.scope('hideSensitive').update(req.body, {
             where: {
-                [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
+                [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },
         })
-        res.status(200).json(user)
+        res.status(200).json(role)
     } catch (e) {
         next(new httpException(500, e))
     }
@@ -64,12 +64,12 @@ const updateOne = async (req, res, next) => {
 
 const deleteOne = async (req, res, next) => {
     try {
-        const user = await User.scope('hideSensitive').destroy({
+        const role = await Role.scope('hideSensitive').destroy({
             where: {
-                [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
+                [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },
         })
-        res.status(200).json(user)
+        res.status(200).json(role)
     } catch (e) {
         next(new httpException(500, e))
     }
