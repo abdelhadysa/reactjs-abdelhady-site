@@ -11,11 +11,15 @@ const express = require('express')
 import apiController from '../controllers/apiController'
 import userRouter from './userRouter'
 import messageRouter from './messageRouter'
+import roleRouter from './roleRouter'
+import permissionRouter from './permssionRouter'
 
 const apiRouter = express.Router()
 
 apiRouter.use('/user', userRouter)
 apiRouter.use('/message', messageRouter)
+apiRouter.use('/role', roleRouter)
+apiRouter.use('/permission', permissionRouter)
 apiRouter.get('/', apiController)
 
 export default apiRouter
