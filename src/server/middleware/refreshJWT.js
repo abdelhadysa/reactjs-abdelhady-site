@@ -12,26 +12,38 @@ import dotenv from 'dotenv'
 import verifyJWT from '../utils/verifyJWT'
 import signJWT from '../utils/signJWT'
 import httpException from '../utils/httpException'
+import jwt from 'jsonwebtoken'
 
 dotenv.config()
 
-const refreshJWT = (req, res, next) => {
+/*
+ * Logic:
+ * JWT token is created and is set to expire in 300 seconds
+ * JWT token is stored in a cookie that is set to expire in 300 seconds
+ * JWT token is checked on every API call for nearing expiry
+ * If the JWT token is expiring in 60 seconds, generate a new token
+ * Place the new token in a new cookie that will then expire in 300 seconds
+ */ 
+
+const refreshJWT = async (req, res, next) => {
     const token = req.signedCookies.token
-    if (!token) return next()
-    verifyJWT(token)
-    .then((decoded) => {
+    if (!token || token === 'undefined') return next() // If token cookie doesn't exist, skip refresh process
+    try {
+        const decoded = await verifyJWT(token) // Verify and decode the JWT token
         const unixTimestamp = Math.floor(Date.now() / 1000)
-        if (decoded.exp - unixTimestamp > 60) {
-            return next(new httpException(400, e))
-        }
+        // console.log(decoded.exp, unixTimestamp)
+        // If the decoded expiry timestamp is still not reached
+        // and the difference is greater than a minute
+        // or the current timestamp exceeds the decoded timestamp
+        // don't renew the token
+        if ((decoded.exp > unixTimestamp && decoded.exp - unixTimestamp > 60) || unixTimestamp > decoded.exp) return next()
         const { username } = decoded
-        signJWT({ username })
-    })
-    .then((token) => {
-        res.cookie('token', token, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true })
-        next()
-    })
-    .catch((e) => next(new httpException((e instanceof jwt.JsonWebTokenError) ? 401 : 400, e)))
+        const newToken = await signJWT({ username }) // Renew token
+        res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true }) // Renew cookie
+        return next()
+    } catch (e) { 
+        return next(new httpException((e instanceof jwt.JsonWebTokenError) ? 401 : 400, e))
+    }
 }
 
 export default refreshJWT

@@ -13,16 +13,10 @@ import jwt from 'jsonwebtoken'
 
 dotenv.config()
 
-const requireJWT = (req, _res, next) => {
+const requireNoJWT = (req, _res, next) => {
     const token = req.signedCookies.token
-    if (!token || token === 'undefined') return next(new httpException(401, 'Access to restricted resource without token'))
-    verifyJWT(token)
-    .then((_decoded) => {
-        req.jwtToken = token
-        req.decodedJWTPayload = _decoded
-        next()
-    })
-    .catch((e) => next(new httpException((e instanceof jwt.JsonWebTokenError) ? 401 : 400, e)))
+    if (token && token !== 'undefined') return next(new httpException(400, 'User already logged in'))
+    next()
 }
 
-export default requireJWT
+export default requireNoJWT
