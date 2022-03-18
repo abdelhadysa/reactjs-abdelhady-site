@@ -13,13 +13,18 @@ import userRouter from './userRouter'
 import messageRouter from './messageRouter'
 import roleRouter from './roleRouter'
 import permissionRouter from './permssionRouter'
+import authRouter from './authRouter'
+import refreshJWT from '../middleware/refreshJWT'
+import requireJWT from '../middleware/requireJWT'
 
 const apiRouter = express.Router()
 
-apiRouter.use('/user', userRouter)
-apiRouter.use('/message', messageRouter)
-apiRouter.use('/role', roleRouter)
-apiRouter.use('/permission', permissionRouter)
+apiRouter.use(refreshJWT)
+apiRouter.use('/user', [requireJWT, userRouter])
+apiRouter.use('/message', [requireJWT, messageRouter])
+apiRouter.use('/role', [requireJWT, roleRouter])
+apiRouter.use('/permission', [requireJWT, permissionRouter])
+apiRouter.use('/auth', authRouter)
 apiRouter.get('/', apiController)
 
 export default apiRouter
