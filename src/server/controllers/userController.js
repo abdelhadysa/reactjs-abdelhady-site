@@ -17,7 +17,7 @@ const { User, Message, Role } = models
 
 const getOne = async (req, res, next) => {
     try {
-        const user = await User.scope('hideSensitive').findAll({
+        const user = await User.scope('hideSensitive').findOne({
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
             },
