@@ -16,7 +16,7 @@ const signJWT = (data = {}) => {
     return new Promise((res, rej) => {
         jwt.sign(data, jwtSecret, {
             algorithm: 'HS256',
-            expiresIn: process.env.COOKIE_MAXAGE,
+            expiresIn: String(process.env.JWT_EXPIRESIN) + ' seconds',
         }, (err, token) => {
             if (err) return rej(err)
             res(token)
