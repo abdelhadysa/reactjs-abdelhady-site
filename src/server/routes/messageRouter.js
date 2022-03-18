@@ -9,12 +9,13 @@
 const path = require('path')
 const express = require('express')
 import * as messageController from '../controllers/messageController'
+import requirePerm from '../middleware/requirePerm'
 
 const messageRouter = express.Router()
 
 messageRouter.post('/', messageController.createOne)
 messageRouter.get('/:id', messageController.getOne)
-messageRouter.get('/', messageController.getAll)
+messageRouter.get('/', [(req, res, next) => requirePerm(req, res, next, 'Get messages'), messageController.getAll])
 messageRouter.put('/:id', messageController.updateOne)
 messageRouter.delete('/:id', messageController.deleteOne)
 

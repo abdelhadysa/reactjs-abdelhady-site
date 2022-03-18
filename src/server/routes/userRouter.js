@@ -9,12 +9,13 @@
 const path = require('path')
 const express = require('express')
 import * as userController from '../controllers/userController'
+import requirePerm from '../middleware/requirePerm'
 
 const userRouter = express.Router()
 
 userRouter.post('/', userController.createOne)
 userRouter.get('/:id', userController.getOne)
-userRouter.get('/', userController.getAll)
+userRouter.get('/', [(req, res, next) => requirePerm(req, res, next, 'Get users'), userController.getAll])
 userRouter.put('/:id', userController.updateOne)
 userRouter.delete('/:id', userController.deleteOne)
 
