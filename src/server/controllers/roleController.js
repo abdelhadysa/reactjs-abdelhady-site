@@ -13,15 +13,15 @@ import { Op } from 'sequelize'
 import httpException from '../utils/httpException'
 import isUuid from '../utils/isUuid'
 
-const { Role, Permission } = models
+const { User, Role, Permission } = models
 
 const getOne = async (req, res, next) => {
     try {
-        const role = await Role.scope('hideSensitive').findAll({
+        const role = await Role.scope('hideSensitive').findOne({
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },
-            include: [Permission],
+            include: [User, Permission],
         })
         res.status(200).json(role)
     } catch (e) {
@@ -31,7 +31,7 @@ const getOne = async (req, res, next) => {
 
 const getAll = async (_req, res, next) => {
     try {
-        const roles = await Role.scope('hideSensitive').findAll()
+        const roles = await Role.scope('hideSensitive').findAll({ include: [User, Permission] })
         res.status(200).json(roles)
     } catch (e) {
         next(new httpException(500, e))
@@ -40,9 +40,7 @@ const getAll = async (_req, res, next) => {
 
 const createOne = async (req, res, next) => {
     try {
-        const role = await Role.scope('hideSensitive').create(req.body, {
-            include: [Permission],
-        })
+        const role = await Role.scope('hideSensitive').create(req.body)
         res.status(200).json(role)
     } catch (e) {
         next(new httpException(500, e))

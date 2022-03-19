@@ -31,7 +31,7 @@ const getOne = async (req, res, next) => {
 
 const getAll = async (_req, res, next) => {
     try {
-        const users = await User.scope('hideSensitive').findAll()
+        const users = await User.scope('hideSensitive').findAll({ include: [Message, Role] })
         res.status(200).json(users)
     } catch (e) {
         next(new httpException(500, e))
@@ -41,7 +41,7 @@ const getAll = async (_req, res, next) => {
 const createOne = async (req, res, next) => {
     try {
         const user = await User.scope('hideSensitive').create(req.body, {
-            include: [Message, Role],
+            include: [Message],
         })
         res.status(200).json(user)
     } catch (e) {

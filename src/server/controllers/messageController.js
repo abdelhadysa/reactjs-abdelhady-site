@@ -16,7 +16,7 @@ const { User, Message } = models
 
 const getOne = async (req, res, next) => {
     try {
-        const message = await Message.scope('hideSensitive').findAll({
+        const message = await Message.scope('hideSensitive').findOne({
             where: {
                 Uuid: {
                     [Op.eq]: req.params.id,

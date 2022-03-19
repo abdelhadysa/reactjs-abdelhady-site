@@ -17,7 +17,7 @@ const { Permission, Role } = models
 
 const getOne = async (req, res, next) => {
     try {
-        const permission = await Permission.scope('hideSensitive').findAll({
+        const permission = await Permission.scope('hideSensitive').findOne({
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },
@@ -40,9 +40,7 @@ const getAll = async (_req, res, next) => {
 
 const createOne = async (req, res, next) => {
     try {
-        const permission = await Permission.scope('hideSensitive').create(req.body, {
-            include: [Role],
-        })
+        const permission = await Permission.scope('hideSensitive').create(req.body)
         res.status(200).json(permission)
     } catch (e) {
         next(new httpException(500, e))
