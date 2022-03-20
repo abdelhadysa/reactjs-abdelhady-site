@@ -13,10 +13,11 @@ import requirePerm from '../middleware/requirePerm'
 
 const userRouter = express.Router()
 
-userRouter.post('/', userController.createOne)
-userRouter.get('/:id', userController.getOne)
-userRouter.get('/', [(req, res, next) => requirePerm(req, res, next, 'Get users'), userController.getAll])
-userRouter.put('/:id', userController.updateOne)
-userRouter.delete('/:id', userController.deleteOne)
+userRouter.post('/', [(req, _res, next) => { req.permNeeded = 'Create user'; return next() }, requirePerm, userController.createOne])
+userRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get user'; return next() }, requirePerm, userController.getOne])
+userRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get users'; return next() }, requirePerm, userController.getAll])
+userRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.updateOne])
+userRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.deleteOne])
+userRouter.put('/role/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.toggleRole])
 
 export default userRouter

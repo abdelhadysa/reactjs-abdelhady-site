@@ -9,13 +9,14 @@
 const path = require('path')
 const express = require('express')
 import * as roleController from '../controllers/roleController'
+import requirePerm from '../middleware/requirePerm'
 
 const roleRouter = express.Router()
 
-roleRouter.post('/', roleController.createOne)
-roleRouter.get('/:id', roleController.getOne)
-roleRouter.get('/', roleController.getAll)
-roleRouter.put('/:id', roleController.updateOne)
-roleRouter.delete('/:id', roleController.deleteOne)
+roleRouter.post('/', [(req, _res, next) => { req.permNeeded = 'Create role'; return next() }, requirePerm, roleController.createOne])
+roleRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get role'; return next() }, requirePerm, roleController.getOne])
+roleRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get roles'; return next() }, requirePerm, roleController.getAll])
+roleRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter role'; return next() }, requirePerm, roleController.updateOne])
+roleRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter role'; return next() }, requirePerm, roleController.deleteOne])
 
 export default roleRouter

@@ -13,10 +13,10 @@ import requirePerm from '../middleware/requirePerm'
 
 const messageRouter = express.Router()
 
-messageRouter.post('/', messageController.createOne)
-messageRouter.get('/:id', messageController.getOne)
-messageRouter.get('/', [(req, res, next) => requirePerm(req, res, next, 'Get messages'), messageController.getAll])
-messageRouter.put('/:id', messageController.updateOne)
-messageRouter.delete('/:id', messageController.deleteOne)
+messageRouter.post('/', [(req, _res, next) => { req.permNeeded = 'Create message'; return next() }, requirePerm, messageController.createOne])
+messageRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get message'; return next() }, requirePerm, messageController.getOne])
+messageRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get messages'; return next() }, requirePerm, messageController.getAll])
+messageRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter message'; return next() }, requirePerm, messageController.updateOne])
+messageRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter message'; return next() }, requirePerm, messageController.deleteOne])
 
 export default messageRouter

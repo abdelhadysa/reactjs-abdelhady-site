@@ -9,13 +9,14 @@
 const path = require('path')
 const express = require('express')
 import * as permissionController from '../controllers/permissionController'
+import requirePerm from '../middleware/requirePerm'
 
 const permissionRouter = express.Router()
 
-permissionRouter.post('/', permissionController.createOne)
-permissionRouter.get('/:id', permissionController.getOne)
-permissionRouter.get('/', permissionController.getAll)
-permissionRouter.put('/:id', permissionController.updateOne)
-permissionRouter.delete('/:id', permissionController.deleteOne)
+permissionRouter.post('/', [(req, _res, next) => { req.permNeeded = 'Create permission'; return next() }, requirePerm, permissionController.createOne])
+permissionRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get permission'; return next() }, requirePerm, permissionController.getOne])
+permissionRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get permissions'; return next() }, requirePerm, permissionController.getAll])
+permissionRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter permission'; return next() }, requirePerm, permissionController.updateOne])
+permissionRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter permission'; return next() }, requirePerm, permissionController.deleteOne])
 
 export default permissionRouter
