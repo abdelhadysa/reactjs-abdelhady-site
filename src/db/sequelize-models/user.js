@@ -27,13 +27,20 @@ const userModel = (sequelize, DataTypes) => {
 				notEmpty: true,
 			},
 		},
+		PasswordHash: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			validate: {
+				notEmpty: true,
+			}
+		}
 	}, {
 		sequelize,
 		modelName: 'User',
 		scopes: {
 			hideSensitive: {
 				attributes: {
-					exclude: ['uuid'],
+					exclude: ['uuid', 'PasswordHash'],
 				},
 			},
 		},
