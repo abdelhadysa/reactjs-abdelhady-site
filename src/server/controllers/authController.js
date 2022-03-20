@@ -70,12 +70,8 @@ const login = async (req, res, next) => {
 }
 
 const logout = async (req, res, next) => {
-    try {
-        res.clearCookie('token')
-        res.status(200).send('Logout request successful').end()
-    } catch(e) {
-        next(new httpException(500, e))
-    }
+    res.clearCookie('token')
+    res.status(200).json('Logout request successful')
 }
 
 
