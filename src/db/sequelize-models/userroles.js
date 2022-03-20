@@ -32,7 +32,7 @@ const userRolesModel = (sequelize, DataTypes) => {
 		scopes: {
 			hideSensitive: {
 				attributes: {
-					exclude: ['uuid'],
+					exclude: ['Uuid'],
 				},
 			},
 		},
