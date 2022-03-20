@@ -9,7 +9,7 @@
 const path = require('path')
 
 import models from 'Database/sequelize-models'
-import { Op } from 'sequelize'
+//import { Op } from 'sequelize'
 import httpException from '../utils/httpException'
 import isUuid from '../utils/isUuid'
 
@@ -75,10 +75,36 @@ const deleteOne = async (req, res, next) => {
     }
 }
 
+const toggleRole = async (req, res, next) => {
+    try {
+        const role = await Role.scope('hideSensitive').findOne({
+            where: {
+                [isUuid(req.body.Role) ? 'Uuid' : 'Name']: req.body.Role,
+            },
+        })
+        if (!role) return next(new httpException(404, 'Requested role does not exist'))
+        const user = await User.scope('hideSensitive').findOne({
+            where: {
+                [isUuid(req.params.id) ? 'Uuid': 'Username']: req.params.id,
+            },
+        })
+        if (!user) return next(new httpException(404, 'Requested user does not exist'))
+        if (await user.hasRole(role)) {
+            await user.removeRole(role)
+        } else {
+            await user.addRole(role)
+        }
+        res.status(200).json(Object.assign({}, user, { Roles: await user.getRoles() }))
+    } catch (e) {
+        next(new httpException(500, e))
+    }
+}
+
 export {
     getOne,
     getAll,
     createOne,
     updateOne,
     deleteOne,
+    toggleRole,
 }
