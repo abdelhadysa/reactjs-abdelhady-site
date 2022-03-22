@@ -9,7 +9,7 @@
 const path = require('path')
 
 import models from 'Database/sequelize-models'
-import { Op } from 'sequelize'
+//import { Op } from 'sequelize'
 import httpException from '../utils/httpException'
 import isUuid from '../utils/isUuid'
 
@@ -17,7 +17,7 @@ const { Permission, Role } = models
 
 const getOne = async (req, res, next) => {
     try {
-        const permission = await Permission.scope('hideSensitive').findOne({
+        const permission = await Permission.findOne({
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },
@@ -31,7 +31,7 @@ const getOne = async (req, res, next) => {
 
 const getAll = async (_req, res, next) => {
     try {
-        const permissions = await Permission.scope('hideSensitive').findAll()
+        const permissions = await Permission.findAll({ include: [Role] })
         res.status(200).json(permissions)
     } catch (e) {
         next(new httpException(500, e))
@@ -40,7 +40,7 @@ const getAll = async (_req, res, next) => {
 
 const createOne = async (req, res, next) => {
     try {
-        const permission = await Permission.scope('hideSensitive').create(req.body)
+        const permission = await Permission.create(req.body)
         res.status(200).json(permission)
     } catch (e) {
         next(new httpException(500, e))
@@ -49,7 +49,7 @@ const createOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
     try {
-        const permission = await Permission.scope('hideSensitive').update(req.body, {
+        const permission = await Permission.update(req.body, {
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },
@@ -62,7 +62,7 @@ const updateOne = async (req, res, next) => {
 
 const deleteOne = async (req, res, next) => {
     try {
-        const permission = await Permission.scope('hideSensitive').destroy({
+        const permission = await Permission.destroy({
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },

@@ -9,19 +9,19 @@
 const path = require('path')
 
 import models from 'Database/sequelize-models'
-import { Op } from 'sequelize'
+//import { Op } from 'sequelize'
 import httpException from '../utils/httpException'
 import isUuid from '../utils/isUuid'
 
-const { User, Role, Permission } = models
+const { Role, Permission } = models
 
 const getOne = async (req, res, next) => {
     try {
-        const role = await Role.scope('hideSensitive').findOne({
+        const role = await Role.findOne({
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },
-            include: [User, Permission],
+            include: [Permission],
         })
         res.status(200).json(role)
     } catch (e) {
@@ -31,7 +31,7 @@ const getOne = async (req, res, next) => {
 
 const getAll = async (_req, res, next) => {
     try {
-        const roles = await Role.scope('hideSensitive').findAll({ include: [User, Permission] })
+        const roles = await Role.findAll({ include: [Permission] })
         res.status(200).json(roles)
     } catch (e) {
         next(new httpException(500, e))
@@ -40,7 +40,7 @@ const getAll = async (_req, res, next) => {
 
 const createOne = async (req, res, next) => {
     try {
-        const role = await Role.scope('hideSensitive').create(req.body)
+        const role = await Role.create(req.body)
         res.status(200).json(role)
     } catch (e) {
         next(new httpException(500, e))
@@ -49,7 +49,7 @@ const createOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
     try {
-        const role = await Role.scope('hideSensitive').update(req.body, {
+        const role = await Role.update(req.body, {
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },
@@ -62,7 +62,7 @@ const updateOne = async (req, res, next) => {
 
 const deleteOne = async (req, res, next) => {
     try {
-        const role = await Role.scope('hideSensitive').destroy({
+        const role = await Role.destroy({
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
             },

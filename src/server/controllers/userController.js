@@ -13,7 +13,7 @@ import models from 'Database/sequelize-models'
 import httpException from '../utils/httpException'
 import isUuid from '../utils/isUuid'
 
-const { User, Message, Role } = models
+const { User, Message, Reaction, Role, Permission, RolePermission, MessageReaction } = models
 
 const getOne = async (req, res, next) => {
     try {
@@ -21,7 +21,13 @@ const getOne = async (req, res, next) => {
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
             },
-            include: [Message, Role],
+            include: [Message, {
+                model: RolePermission,
+                include: [Role, Permission]
+            }, {
+                model: MessageReaction,
+                include: [Message, Reaction]
+            }],
         })
         res.status(200).json(user)
     } catch (e) {
@@ -31,7 +37,13 @@ const getOne = async (req, res, next) => {
 
 const getAll = async (_req, res, next) => {
     try {
-        const users = await User.scope('hideSensitive').findAll({ include: [Message, Role] })
+        const users = await User.scope('hideSensitive').findAll({ include: [Message, {
+            model: RolePermission,
+            include: [Role, Permission]
+        }, {
+            model: MessageReaction,
+            include: [Message, Reaction]
+        }] })
         res.status(200).json(users)
     } catch (e) {
         next(new httpException(500, e))
@@ -40,9 +52,7 @@ const getAll = async (_req, res, next) => {
 
 const createOne = async (req, res, next) => {
     try {
-        const user = await User.scope('hideSensitive').create(req.body, {
-            include: [Message],
-        })
+        const user = await User.create(req.body)
         res.status(200).json(user)
     } catch (e) {
         next(new httpException(500, e))
@@ -51,7 +61,7 @@ const createOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
     try {
-        const user = await User.scope('hideSensitive').update(req.body, {
+        const user = await User.update(req.body, {
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
             },
@@ -64,7 +74,7 @@ const updateOne = async (req, res, next) => {
 
 const deleteOne = async (req, res, next) => {
     try {
-        const user = await User.scope('hideSensitive').destroy({
+        const user = await User.destroy({
             where: {
                 [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
             },
@@ -75,9 +85,10 @@ const deleteOne = async (req, res, next) => {
     }
 }
 
-const toggleRole = async (req, res, next) => {
+const alterRole = async (req, res, next) => {
     try {
-        const role = await Role.scope('hideSensitive').findOne({
+        if (!req.body.Action || (req.body.Action !== 'Grant' && req.body.Action !== 'Revoke')) return next(new httpException(400, 'Invalid action (Grant or Revoke needed)'))
+        const role = await Role.findOne({
             where: {
                 [isUuid(req.body.Role) ? 'Uuid' : 'Name']: req.body.Role,
             },
@@ -89,12 +100,14 @@ const toggleRole = async (req, res, next) => {
             },
         })
         if (!user) return next(new httpException(404, 'Requested user does not exist'))
-        if (await user.hasRole(role)) {
-            await user.removeRole(role)
+        const rolePermissions = await role.getRolePermissions()
+        let newUserRolePermissions
+        if (req.body.Action === 'Grant') {
+            newUserRolePermissions = await user.addRolePermissions(rolePermissions)
         } else {
-            await user.addRole(role)
+            newUserRolePermissions = await user.removeRolePermissions(rolePermissions)
         }
-        res.status(200).json(Object.assign({}, user, { Roles: await user.getRoles() }))
+        res.status(200).json(Object.assign({}, user, { RolePermissions: newUserRolePermissions }))
     } catch (e) {
         next(new httpException(500, e))
     }
@@ -106,5 +119,5 @@ export {
     createOne,
     updateOne,
     deleteOne,
-    toggleRole,
+    alterRole
 }

@@ -27,18 +27,20 @@ const register = async (req, res, next) => {
         if (!Username) return next(new httpException(400, 'No username specified'))
         if (!Password || Password.length < 8 || Password.length > 65) return next(new httpException(400, 'Password should be from 8 to 65 characters'))
         const hashedPass = await hashPass(Password)
-        const user = await User/*.scope('hideSensitive')*/.create({
+        const user = await User.create({
             Username: Username,
             PasswordHash: hashedPass,
         })
-        const userRole = await Role.scope('hideSensitive').findOne({
+        const userRole = await Role.findOne({
             where: {
                 Name: {
                     [Op.eq]: 'User'
                 },
             },
         })
-        await user.addRole(userRole)
+        for (const rolePermission of await userRole.getRolePermissions()) {
+            await user.addRolePermission(rolePermission)
+        }
         signJWT({ username: Username })
         .then((newToken) => {
             res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true })
@@ -54,7 +56,7 @@ const login = async (req, res, next) => {
     try {
         const { Username, Password } = req.body
         if (!Username) return next(new httpException(400, 'No username specified'))
-        const user = await User/*.scope('hideSensitive')*/.findOne({
+        const user = await User.findOne({
             where: {
                 Username: {
                     [Op.eq]: Username,

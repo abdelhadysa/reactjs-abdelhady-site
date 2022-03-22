@@ -11,18 +11,23 @@ const path = require('path')
 import models from 'Database/sequelize-models'
 //import { Op } from 'sequelize'
 import httpException from '../utils/httpException'
+import isUuid from '../utils/isUuid'
 
-const { User, Message, Reaction } = models
+const { User, Message, Reaction, MessageReaction } = models
 
 const getOne = async (req, res, next) => {
     try {
-        const message = await Message.findOne({
+        const reaction = await Reaction.findOne({
             where: {
-                Uuid: req.params.id,
+                [isUuid(req.params.id) ? 'Uuid': 'Name']: req.params.id,
             },
-            include: [User, Reaction],
+            include: [Message, {
+                model: MessageReaction,
+                include: [User]
+            }]
         })
-        res.status(200).json(message)
+        if (!reaction) return next(new httpException(404, 'Reaction not found'))
+        res.status(200).json(reaction)
     } catch (e) {
         next(new httpException(500, e))
     }
@@ -30,8 +35,12 @@ const getOne = async (req, res, next) => {
 
 const getAll = async (_req, res, next) => {
     try {
-        const messages = await Message.findAll({ include: [User, Reaction] })
-        res.status(200).json(messages)
+        const reaction = await Reaction.findAll({ include: [Message, {
+            model: MessageReaction,
+            include: [User],
+        }]})
+        if (!reaction.length) return next(new httpException(404, 'Reactions not found'))
+        res.status(200).json(reaction)
     } catch (e) {
         next(new httpException(500, e))
     }
@@ -39,8 +48,8 @@ const getAll = async (_req, res, next) => {
 
 const createOne = async (req, res, next) => {
     try {
-        const message = await Message.create(req.body)
-        res.status(200).json(message)
+        const reaction = await Reaction.create(req.body)
+        res.status(200).json(reaction)
     } catch (e) {
         next(new httpException(500, e))
     }
@@ -48,12 +57,12 @@ const createOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
     try {
-        const message = await Message.update(req.body, {
+        const reaction = await Reaction.update(req.body, {
             where: {
-                Uuid: req.params.id,
+                [isUuid(req.params.id) ? 'Uuid': 'Name']: req.params.id,
             },
         })
-        res.status(200).json(message)
+        res.status(200).json(reaction)
     } catch (e) {
         next(new httpException(500, e))
     }
@@ -61,12 +70,12 @@ const updateOne = async (req, res, next) => {
 
 const deleteOne = async (req, res, next) => {
     try {
-        const message = await Message.destroy({
+        const reaction = await Reaction.delete({
             where: {
-                Uuid: req.params.id,
-            },
+                [isUuid(req.params.id) ? 'Uuid': 'Name']: req.params.id,
+            }
         })
-        res.status(200).json(message)
+        res.status(200).json(reaction)
     } catch (e) {
         next(new httpException(500, e))
     }
