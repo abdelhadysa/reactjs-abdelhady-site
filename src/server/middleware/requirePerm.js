@@ -11,29 +11,29 @@ const path = require('path')
 import models from 'Database/sequelize-models'
 import httpException from '../utils/httpException'
 
-const { User, Permission } = models
+const { User, Role, Permission, RolePermission } = models
 
 const requirePerm = async (req, res, next) => {
     if (!req.jwtToken || !req.decodedJWTPayload) return next(new httpException(401, 'Missing payload data'))
     const { decodedJWTPayload, permNeeded } = req
     try {
-        const permission = await Permission.scope('hideSensitive').findOne({
+        const user = await User.findOne({
+            where: {
+                Username: decodedJWTPayload.username,
+            },
+        })
+        if (!user) return next(new httpException(400, 'User no longer exists'))
+        const permission = await Permission.findOne({
             where: {
                 Name: permNeeded,
             },
         })
-        if (!permission) return next(new httpException(404, 'Permission name not found'))
-        const user = await User.scope('hideSensitive').findOne({
-            where: {
-                Username: decodedJWTPayload.username,    
-            },
-        })
-        if (!user) return next(new httpException(404, 'User name not found'))
-        const userRoles = await user.getRoles()
-        for (const role of userRoles) {
-            if (await role.hasPermission(permission)) return next()
+        if (!permission) return next(new httpException(404, 'Permission not found'))
+        const userRolePermissions = await user.getRolePermissions()
+        for (const userRolePermission of userRolePermissions) {
+            if (userRolePermission.PermissionUuid === permission.Uuid) return next()
         }
-        return next(new httpException(401, 'Unauthorized access'))
+        next(new httpException(401, 'Unauthorized user'))
     } catch (e) {
         return next(new httpException(500, e))
     }
