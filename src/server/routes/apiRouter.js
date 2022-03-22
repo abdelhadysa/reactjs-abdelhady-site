@@ -14,6 +14,7 @@ import messageRouter from './messageRouter'
 import roleRouter from './roleRouter'
 import permissionRouter from './permssionRouter'
 import authRouter from './authRouter'
+import reactionRouter from './reactionRouter'
 import refreshJWT from '../middleware/refreshJWT'
 import requireJWT from '../middleware/requireJWT'
 
@@ -25,6 +26,7 @@ apiRouter.use('/message', [requireJWT, messageRouter])
 apiRouter.use('/role', [requireJWT, roleRouter])
 apiRouter.use('/permission', [requireJWT, permissionRouter])
 apiRouter.use('/auth', authRouter)
+apiRouter.use('/reaction', [requireJWT, reactionRouter])
 apiRouter.get('/', apiController)
 
 export default apiRouter
