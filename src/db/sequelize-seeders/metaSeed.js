@@ -170,11 +170,65 @@ const metaPermission = [
         Description: 'Update or delete one message',
         Roles: [2, 1],
     },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Get reactions',
+        Description: 'Get all reactions',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Get reaction',
+        Description: 'Get one reaction',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Create reaction',
+        Description: 'Create a new reaction',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Alter reaction',
+        Description: 'Update or delete one reaction',
+        Roles: [2],
+    },
 ]
+
+let metaRolePermission = []
+
+for (const permission of metaPermission) {
+    for (const permissionRole of permission.Roles) {
+        metaRolePermission.push({
+            Uuid: crypto.randomUUID(),
+            RoleUuid: metaRole[permissionRole].Uuid,
+            PermissionUuid: permission.Uuid,
+        })
+    }
+}
+
+let metaUserRolePermission = []
+
+for (const user of metaUser) {
+    for (const userRole of user.Roles) {
+        for (const rolePermission of metaRolePermission) {
+            if (rolePermission.RoleUuid === metaRole[userRole].Uuid) {
+                metaUserRolePermission.push({
+                    Uuid: crypto.randomUUID(),
+                    UserUuid: user.Uuid,
+                    RolePermissionUuid: rolePermission.Uuid,
+                })
+            }
+        }
+    }
+}
 
 module.exports = {
     metaUser,
     metaMessage,
     metaRole,
     metaPermission,
+    metaRolePermission,
+    metaUserRolePermission,
 }
