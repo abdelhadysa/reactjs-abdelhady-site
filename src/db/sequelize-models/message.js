@@ -8,7 +8,9 @@ const messageModel = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Message.belongsTo(models.User, { foreignKey: { allowNull: false } })
+			Message.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { allowNull: false } })
+			Message.belongsToMany(models.Reaction, { through: models.MessageReaction })
+			Message.hasMany(models.MessageReaction)
 		}
 	}
 	Message.init({
@@ -40,13 +42,6 @@ const messageModel = (sequelize, DataTypes) => {
 	}, {
 		sequelize,
 		modelName: 'Message',
-		scopes: {
-			hideSensitive: {
-				attributes: {
-					exclude: ['Uuid'],
-				},
-			},
-		},
 		createdAt: 'CreatedAt',
 		updatedAt: 'UpdatedAt',
 	});

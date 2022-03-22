@@ -11,8 +11,11 @@ import userModel from './user'
 import messageModel from './message'
 import roleModel from './role'
 import permissionModel from './permission'
-import userRolesModel from './userroles'
-import rolePermissionsModel from './rolepermissions'
+import rolePermissionModel from './rolepermission'
+import userRolePermissionModel from './userrolepermission'
+import reactionModel from './reaction'
+import messageReactionModel from './messagereaction'
+import userMessageReactionModel from './usermessagereaction'
 
 let sequelize;
 if (config.use_env_variable) {
@@ -23,11 +26,14 @@ if (config.use_env_variable) {
 
 const models = {
 	User: userModel(sequelize, Sequelize.DataTypes),
-	Message: messageModel(sequelize, Sequelize.DataTypes),
 	Role: roleModel(sequelize, Sequelize.DataTypes),
 	Permission: permissionModel(sequelize, Sequelize.DataTypes),
-	UserRoles: userRolesModel(sequelize, Sequelize.DataTypes),
-	RolePermissions: rolePermissionsModel(sequelize, Sequelize.DataTypes),
+	RolePermission: rolePermissionModel(sequelize, Sequelize.DataTypes),
+	UserRolePermission: userRolePermissionModel(sequelize, Sequelize.DataTypes),
+	Message: messageModel(sequelize, Sequelize.DataTypes),
+	Reaction: reactionModel(sequelize, Sequelize.DataTypes),
+	MessageReaction: messageReactionModel(sequelize, Sequelize.DataTypes),
+	UserMessageReaction: userMessageReactionModel(sequelize, Sequelize.DataTypes),
 };
 
 //require.context(__dirname, false, /^((?!index).)*\.js$/)

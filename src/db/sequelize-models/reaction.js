@@ -1,18 +1,20 @@
 'use strict';
-import { Model } from 'sequelize'
-const roleModel = (sequelize, DataTypes) => {
-	class Role extends Model {
+const {
+	Model
+} = require('sequelize');
+const reactionModel = (sequelize, DataTypes) => {
+	class Reaction extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Role.belongsToMany(models.Permission, { through: models.RolePermission })
-			Role.hasMany(models.RolePermission)
+			Reaction.belongsToMany(models.Message, { through: models.MessageReaction })
+			Reaction.hasMany(models.MessageReaction)
 		}
 	}
-	Role.init({
+	Reaction.init({
 		Uuid: {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
@@ -27,16 +29,14 @@ const roleModel = (sequelize, DataTypes) => {
 				notEmpty: true,
 			},
 		},
-		Description: {
-			type: DataTypes.STRING
-		},
+		Points: DataTypes.INTEGER
 	}, {
 		sequelize,
-		modelName: 'Role',
+		modelName: 'Reaction',
 		createdAt: 'CreatedAt',
 		updatedAt: 'UpdatedAt',
 	});
-	return Role;
+	return Reaction;
 };
 
-export default roleModel
+export default reactionModel

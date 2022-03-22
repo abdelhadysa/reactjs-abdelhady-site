@@ -8,7 +8,8 @@ const permissionModel = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Permission.belongsToMany(models.Role, { through: models.RolePermissions })
+			Permission.belongsToMany(models.Role, { through: models.RolePermission })
+			Permission.hasMany(models.RolePermission)
 		}
 	}
 	Permission.init({
@@ -32,13 +33,6 @@ const permissionModel = (sequelize, DataTypes) => {
 	}, {
 		sequelize,
 		modelName: 'Permission',
-		scopes: {
-			hideSensitive: {
-				attributes: {
-					exclude: ['Uuid'],
-				},
-			},
-		},
 		createdAt: 'CreatedAt',
 		updatedAt: 'UpdatedAt',
 	});

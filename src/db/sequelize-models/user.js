@@ -9,7 +9,10 @@ const userModel = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			User.hasMany(models.Message, { onDelete: 'CASCADE', foreignKey: { allowNull: false, name: 'UserUuid' } })
-			User.belongsToMany(models.Role, { through: models.UserRoles })
+			User.belongsToMany(models.RolePermission, { through: models.UserRolePermission })
+			User.belongsToMany(models.MessageReaction, { through: models.UserMessageReaction })
+			User.hasMany(models.UserRolePermission)
+			User.hasMany(models.UserMessageReaction)
 		}
 	}
 	User.init({
@@ -40,7 +43,7 @@ const userModel = (sequelize, DataTypes) => {
 		scopes: {
 			hideSensitive: {
 				attributes: {
-					exclude: ['Uuid', 'PasswordHash'],
+					exclude: ['PasswordHash'],
 				},
 			},
 		},
