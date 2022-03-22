@@ -36,7 +36,7 @@ const refreshJWT = async (req, res, next) => {
         // and the difference is greater than a minute
         // or the current timestamp exceeds the decoded timestamp
         // don't renew the token
-        if (decoded.exp - unixTimestamp > 60) return next()
+        if (decoded.exp - unixTimestamp > process.env.JWT_REFRESHIN) return next()
         const { username } = decoded
         const newToken = await signJWT({ username }) // Renew token
         res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true }) // Renew cookie
