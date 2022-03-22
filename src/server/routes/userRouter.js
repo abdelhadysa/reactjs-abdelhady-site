@@ -18,6 +18,6 @@ userRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get user'; retu
 userRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get users'; return next() }, requirePerm, userController.getAll])
 userRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.updateOne])
 userRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.deleteOne])
-userRouter.put('/role/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.toggleRole])
+userRouter.put('/role/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.alterRole])
 
 export default userRouter
