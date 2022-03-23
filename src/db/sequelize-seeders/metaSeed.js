@@ -208,6 +208,54 @@ const metaPermission = [
         Description: 'Update or delete one reaction',
         Roles: [2],
     },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Get logs',
+        Description: 'Get all logs',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Get log',
+        Description: 'Get one log',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Create log',
+        Description: 'Create a new log',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Alter log',
+        Description: 'Update or delete one log',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Get tags',
+        Description: 'Get all tags',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Get tag',
+        Description: 'Get one tag',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Create tag',
+        Description: 'Create a new tag',
+        Roles: [2],
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Alter tag',
+        Description: 'Update or delete one tag',
+        Roles: [2],
+    },
 ]
 
 let metaRolePermission = []
