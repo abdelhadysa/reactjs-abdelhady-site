@@ -11,6 +11,9 @@ const messageModel = (sequelize, DataTypes) => {
 			Message.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { allowNull: false } })
 			Message.belongsToMany(models.Reaction, { through: models.MessageReaction })
 			Message.hasMany(models.MessageReaction)
+			Message.belongsToMany(models.Tag, { through: models.MessageTag })
+			Message.hasMany(models.MessageTag)
+			Message.hasMany(models.UserSavedMessage)
 		}
 	}
 	Message.init({

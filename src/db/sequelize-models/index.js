@@ -16,6 +16,11 @@ import userRolePermissionModel from './userrolepermission'
 import reactionModel from './reaction'
 import messageReactionModel from './messagereaction'
 import userMessageReactionModel from './usermessagereaction'
+import logModel from './log'
+import messageTagModel from './messagetag'
+import tagModel from './tag'
+import userMessageTagModel from './usermessagetag'
+import userSavedMessageModel from './usersavedmessage'
 
 let sequelize;
 if (config.use_env_variable) {
@@ -34,6 +39,11 @@ const models = {
 	Reaction: reactionModel(sequelize, Sequelize.DataTypes),
 	MessageReaction: messageReactionModel(sequelize, Sequelize.DataTypes),
 	UserMessageReaction: userMessageReactionModel(sequelize, Sequelize.DataTypes),
+	Log: logModel(sequelize, Sequelize.DataTypes),
+	MessageTag: messageTagModel(sequelize, Sequelize.DataTypes),
+	Tag: tagModel(sequelize, Sequelize.DataTypes),
+	UserMessageTag: userMessageTagModel(sequelize, Sequelize.DataTypes),
+	UserSavedMessage: userSavedMessageModel(sequelize, Sequelize.DataTypes),
 };
 
 //require.context(__dirname, false, /^((?!index).)*\.js$/)
