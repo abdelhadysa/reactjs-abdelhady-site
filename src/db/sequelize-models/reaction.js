@@ -27,6 +27,7 @@ const reactionModel = (sequelize, DataTypes) => {
 			allowNull: false,
 			validate: {
 				notEmpty: true,
+				is: /(^[A-Za-z0-9_\S ]+)/,
 			},
 		},
 		Points: DataTypes.INTEGER

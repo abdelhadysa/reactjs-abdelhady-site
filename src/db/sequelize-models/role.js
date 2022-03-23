@@ -27,10 +27,16 @@ const roleModel = (sequelize, DataTypes) => {
 			allowNull: false,
 			validate: {
 				notEmpty: true,
+				is: /(^[A-Za-z0-9_\S ]+)/,
 			},
 		},
 		Description: {
-			type: DataTypes.STRING
+			type: DataTypes.STRING,
+			allowNull: false,
+			validate: {
+				notEmpty: true,
+				is: /(^[A-Za-z0-9_\S ]+)/,
+			},
 		},
 	}, {
 		sequelize,

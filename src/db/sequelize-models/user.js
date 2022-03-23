@@ -28,7 +28,37 @@ const userModel = (sequelize, DataTypes) => {
 			allowNull: false,
 			validate: {
 				notEmpty: true,
+				is: /(^[A-Za-z0-9_]+)/,
 			},
+		},
+		Email: {
+			type: DataTypes.STRING,
+			unique: true,
+			allowNull: false,
+			validate: {
+				notEmpty: true,
+				isEmail: true,
+			},
+		},
+		LastVisit: {
+			type: DataTypes.DATE,
+			allowNull: true,
+		},
+		IpAddress: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			validate: {
+				notEmpty: true,
+				isIP: true,
+			},
+		},
+		Device: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		AvatarUrl: {
+			type: DataTypes.STRING,
+			allowNull: true,
 		},
 		PasswordHash: {
 			type: DataTypes.STRING,
