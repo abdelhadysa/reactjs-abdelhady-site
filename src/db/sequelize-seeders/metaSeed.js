@@ -266,33 +266,17 @@ const metaReaction = [
     }
 ]
 
-const metaMessageReaction = [
-    {
-        Uuid: crypto.randomUUID(),
-        MessageUuid: metaMessage[0].Uuid,
-        ReactionUuid: metaReaction[0].Uuid,
-    },
-    {
-        Uuid: crypto.randomUUID(),
-        MessageUuid: metaMessage[1].Uuid,
-        ReactionUuid: metaReaction[1].Uuid,
-    },
-    {
-        Uuid: crypto.randomUUID(),
-        MessageUuid: metaMessage[2].Uuid,
-        ReactionUuid: metaReaction[2].Uuid,
-    },
-    {
-        Uuid: crypto.randomUUID(),
-        MessageUuid: metaMessage[3].Uuid,
-        ReactionUuid: metaReaction[3].Uuid,
-    },
-    {
-        Uuid: crypto.randomUUID(),
-        MessageUuid: metaMessage[4].Uuid,
-        ReactionUuid: metaReaction[4].Uuid,
-    },
-]
+let metaMessageReaction = []
+
+for (const message of metaMessage) {
+    for (const reaction of metaReaction) {
+        metaMessageReaction.push({
+            Uuid: crypto.randomUUID(),
+            MessageUuid: message.Uuid,
+            ReactionUuid: reaction.Uuid,
+        })
+    }
+}
 
 const metaUserMessageReaction = [
     {
