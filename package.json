@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/h2o-creator/reactjs-abdelhady-site.git"
+    "url": "git+https://github.com/abdelhadysa1/reactjs-abdelhady-site.git"
   },
   "keywords": [
     "abdelhady",
@@ -34,9 +34,9 @@
   "author": "Abdelhady \"H2O\" Salah",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/h2o-creator/reactjs-abdelhady-site/issues"
+    "url": "https://github.com/abdelhadysa1/reactjs-abdelhady-site/issues"
   },
-  "homepage": "https://github.com/h2o-creator/reactjs-abdelhady-site#readme",
+  "homepage": "https://github.com/abdelhadysa1/reactjs-abdelhady-site#readme",
   "dependencies": {
     "axios": "^0.26.1",
     "bcrypt": "^5.0.1",
