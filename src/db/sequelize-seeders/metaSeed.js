@@ -5,21 +5,33 @@ const metaUser = [
     {
         Uuid: crypto.randomUUID(),
         Username: 'abdelhady',
+        Email: 'abdelhady@abdelhady.com.de',
+        IpAddress: '127.0.0.1',
+        Device: 'Unknown',
         Roles: [0, 1, 2],
     },
     {
         Uuid: crypto.randomUUID(),
         Username: 'abdelrahman',
+        Email: 'abdelrahman@abdelrahman.com',
+        IpAddress: '127.0.0.1',
+        Device: 'Unknown',
         Roles: [0, 1],
     },
     {
         Uuid: crypto.randomUUID(),
         Username: 'marwan',
+        Email: 'marwan@marwan.com',
+        IpAddress: '127.0.0.1',
+        Device: 'Unknown',
         Roles: [0],
     },
     {
         Uuid: crypto.randomUUID(),
         Username: 'minyoo',
+        Email: 'minyoo@minyoo.com',
+        IpAddress: '127.0.0.1',
+        Device: 'Unknown',
         Roles: [0],
     },
 ]

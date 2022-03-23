@@ -8,7 +8,11 @@ module.exports = {
 			return {
 				Uuid: user.Uuid,
 				Username: user.Username,
+				Email: user.Email,
+				IpAddress: user.IpAddress,
+				Device: user.Device,
 				PasswordHash: defaultPass,
+				LastVisit: new Date(),
 				CreatedAt: new Date(),
 				UpdatedAt: new Date(),
 			}
