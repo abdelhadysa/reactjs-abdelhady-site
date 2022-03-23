@@ -15,6 +15,7 @@ import httpException from '../utils/httpException'
 const { User, Message, Reaction } = models
 
 const getOne = async (req, res, next) => {
+    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
     try {
         const message = await Message.findOne({
             where: {
@@ -38,6 +39,7 @@ const getAll = async (_req, res, next) => {
 }
 
 const createOne = async (req, res, next) => {
+    if (!req.body) return next(new httpException(400, 'Missing Request Body'))
     try {
         const message = await Message.create(req.body)
         const reactions = await Reaction.findAll()
@@ -49,6 +51,7 @@ const createOne = async (req, res, next) => {
 }
 
 const updateOne = async (req, res, next) => {
+    if (!req.params.id || !req.body) return next(new httpException(400, 'Missing ID Parameter or Request Body'))
     try {
         const message = await Message.update(req.body, {
             where: {
@@ -62,6 +65,7 @@ const updateOne = async (req, res, next) => {
 }
 
 const deleteOne = async (req, res, next) => {
+    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
     try {
         const message = await Message.destroy({
             where: {

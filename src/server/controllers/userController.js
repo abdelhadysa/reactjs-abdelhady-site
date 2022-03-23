@@ -16,6 +16,7 @@ import isUuid from '../utils/isUuid'
 const { User, Message, Reaction, Role, Permission, RolePermission, MessageReaction } = models
 
 const getOne = async (req, res, next) => {
+    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
     try {
         const user = await User.scope('hideSensitive').findOne({
             where: {
@@ -51,6 +52,7 @@ const getAll = async (_req, res, next) => {
 }
 
 const createOne = async (req, res, next) => {
+    if (!req.body) return next(new httpException(400, 'Missing Request Body'))
     try {
         const user = await User.create(req.body)
         const userRole = await Role.scope('defaultUser').findOne()
@@ -62,6 +64,7 @@ const createOne = async (req, res, next) => {
 }
 
 const updateOne = async (req, res, next) => {
+    if (!req.body || !req.params.id) return next(new httpException(400, 'Missing Request Body or ID'))
     try {
         const user = await User.update(req.body, {
             where: {
@@ -75,6 +78,7 @@ const updateOne = async (req, res, next) => {
 }
 
 const deleteOne = async (req, res, next) => {
+    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
     try {
         const user = await User.destroy({
             where: {
@@ -88,8 +92,9 @@ const deleteOne = async (req, res, next) => {
 }
 
 const alterRolePermission = async (req, res, next) => {
+    if (!req.params.id || !req.params.roleId) return next(new httpException(400, 'Missing ID Parameter'))
+    if (!req.body.Action || (req.body.Action !== 'Grant' && req.body.Action !== 'Revoke')) return next(new httpException(400, 'Invalid action (Grant or Revoke needed)'))
     try {
-        if (!req.body.Action || (req.body.Action !== 'Grant' && req.body.Action !== 'Revoke')) return next(new httpException(400, 'Invalid action (Grant or Revoke needed)'))
         const role = await Role.findOne({
             where: {
                 [isUuid(req.params.roleId) ? 'Uuid' : 'Name']: req.params.roleId,
@@ -115,6 +120,7 @@ const alterRolePermission = async (req, res, next) => {
 }
 
 const alterMessageReaction = async (req, res, next) => {
+    if (!req.params.id || !req.params.messageId || !req.params.reactionId) return next(new httpException(400, 'Missing ID Parameter'))
     try {
         const user = await User.scope('hideSensitive').findOne({
             where: {

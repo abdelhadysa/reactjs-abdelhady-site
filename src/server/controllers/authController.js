@@ -24,7 +24,7 @@ const { User, Role } = models
 const register = async (req, res, next) => {
     try {
         const { Username, Password } = req.body
-        if (!Username) return next(new httpException(400, 'No username specified'))
+        if (!Username || Username.length < 3 || Username.length > 15) return next(new httpException(400, 'Username should be from 3 to 15 characters'))
         if (!Password || Password.length < 8 || Password.length > 65) return next(new httpException(400, 'Password should be from 8 to 65 characters'))
         const hashedPass = await hashPass(Password)
         const user = await User.create({
@@ -48,6 +48,7 @@ const login = async (req, res, next) => {
     try {
         const { Username, Password } = req.body
         if (!Username) return next(new httpException(400, 'No username specified'))
+        if (!Password) return next(new httpException(400, 'No password specified'))
         const user = await User.findOne({
             where: {
                 Username: {

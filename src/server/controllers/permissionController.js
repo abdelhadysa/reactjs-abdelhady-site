@@ -16,6 +16,7 @@ import isUuid from '../utils/isUuid'
 const { Permission, Role } = models
 
 const getOne = async (req, res, next) => {
+    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
     try {
         const permission = await Permission.findOne({
             where: {
@@ -39,6 +40,7 @@ const getAll = async (_req, res, next) => {
 }
 
 const createOne = async (req, res, next) => {
+    if (!req.body) return next(new httpException(400, 'Missing Request Body'))
     try {
         const permission = await Permission.create(req.body)
         res.status(200).json(permission)
@@ -48,6 +50,7 @@ const createOne = async (req, res, next) => {
 }
 
 const updateOne = async (req, res, next) => {
+    if (!req.params.id || !req.body) return next(new httpException(400, 'Missing ID Parameter or Request Body'))
     try {
         const permission = await Permission.update(req.body, {
             where: {
@@ -61,6 +64,7 @@ const updateOne = async (req, res, next) => {
 }
 
 const deleteOne = async (req, res, next) => {
+    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
     try {
         const permission = await Permission.destroy({
             where: {
