@@ -13,6 +13,8 @@ import userRouter from './userRouter'
 import messageRouter from './messageRouter'
 import roleRouter from './roleRouter'
 import permissionRouter from './permssionRouter'
+import logRouter from './logRouter'
+import tagRouter from './tagRouter'
 import authRouter from './authRouter'
 import reactionRouter from './reactionRouter'
 import refreshJWT from '../middleware/refreshJWT'
@@ -27,6 +29,8 @@ apiRouter.use('/role', [requireJWT, roleRouter])
 apiRouter.use('/permission', [requireJWT, permissionRouter])
 apiRouter.use('/auth', authRouter)
 apiRouter.use('/reaction', [requireJWT, reactionRouter])
+apiRouter.use('/log', [requireJWT, logRouter])
+apiRouter.use('/tag', [requireJWT, tagRouter])
 apiRouter.get('/', apiController)
 
 export default apiRouter
