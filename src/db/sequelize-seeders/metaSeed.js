@@ -224,6 +224,90 @@ for (const user of metaUser) {
     }
 }
 
+const metaReaction = [
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Heart',
+        Points: 1
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Support',
+        Points: 2
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Confused',
+        Points: 1
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Sad',
+        Points: 1
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        Name: 'Angry',
+        Points: 1
+    }
+]
+
+const metaMessageReaction = [
+    {
+        Uuid: crypto.randomUUID(),
+        MessageUuid: metaMessage[0].Uuid,
+        ReactionUuid: metaReaction[0].Uuid,
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        MessageUuid: metaMessage[1].Uuid,
+        ReactionUuid: metaReaction[1].Uuid,
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        MessageUuid: metaMessage[2].Uuid,
+        ReactionUuid: metaReaction[2].Uuid,
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        MessageUuid: metaMessage[3].Uuid,
+        ReactionUuid: metaReaction[3].Uuid,
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        MessageUuid: metaMessage[4].Uuid,
+        ReactionUuid: metaReaction[4].Uuid,
+    },
+]
+
+const metaUserMessageReaction = [
+    {
+        Uuid: crypto.randomUUID(),
+        UserUuid: metaUser[0].Uuid,
+        MessageReactionUuid: metaMessageReaction[0].Uuid,
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        UserUuid: metaUser[0].Uuid,
+        MessageReactionUuid: metaMessageReaction[1].Uuid,
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        UserUuid: metaUser[1].Uuid,
+        MessageReactionUuid: metaMessageReaction[2].Uuid,
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        UserUuid: metaUser[2].Uuid,
+        MessageReactionUuid: metaMessageReaction[3].Uuid,
+    },
+    {
+        Uuid: crypto.randomUUID(),
+        UserUuid: metaUser[3].Uuid,
+        MessageReactionUuid: metaMessageReaction[4].Uuid,
+    },
+]
+
 module.exports = {
     metaUser,
     metaMessage,
@@ -231,4 +315,7 @@ module.exports = {
     metaPermission,
     metaRolePermission,
     metaUserRolePermission,
+    metaReaction,
+    metaMessageReaction,
+    metaUserMessageReaction,
 }
