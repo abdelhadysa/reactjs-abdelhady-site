@@ -40,6 +40,8 @@ const getAll = async (_req, res, next) => {
 const createOne = async (req, res, next) => {
     try {
         const message = await Message.create(req.body)
+        const reactions = await Reaction.findAll()
+        await message.addReactions(reactions)
         res.status(200).json(message)
     } catch (e) {
         next(new httpException(500, e))
