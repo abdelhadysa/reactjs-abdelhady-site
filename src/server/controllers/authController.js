@@ -31,16 +31,8 @@ const register = async (req, res, next) => {
             Username: Username,
             PasswordHash: hashedPass,
         })
-        const userRole = await Role.findOne({
-            where: {
-                Name: {
-                    [Op.eq]: 'User'
-                },
-            },
-        })
-        for (const rolePermission of await userRole.getRolePermissions()) {
-            await user.addRolePermission(rolePermission)
-        }
+        const userRole = await Role.scope('defaultUser').findOne()
+        await user.addRolePermission(await userRole.getRolePermissions())
         signJWT({ username: Username })
         .then((newToken) => {
             res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true })

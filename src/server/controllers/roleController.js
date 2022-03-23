@@ -41,7 +41,9 @@ const getAll = async (_req, res, next) => {
 const createOne = async (req, res, next) => {
     try {
         const role = await Role.create(req.body)
-        res.status(200).json(role)
+        const userRole = await Role.scope('defaultUser').findOne()
+        const rolePerms = await role.addRolePermissions(await userRole.getRolePermissions())
+        res.status(200).json(Object.assign({}, role, { RolePermissions: rolePerms }))
     } catch (e) {
         next(new httpException(500, e))
     }

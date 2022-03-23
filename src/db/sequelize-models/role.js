@@ -1,5 +1,7 @@
 'use strict';
 import { Model } from 'sequelize'
+import dotenv from 'dotenv'
+dotenv.config()
 const roleModel = (sequelize, DataTypes) => {
 	class Role extends Model {
 		/**
@@ -35,6 +37,13 @@ const roleModel = (sequelize, DataTypes) => {
 		modelName: 'Role',
 		createdAt: 'CreatedAt',
 		updatedAt: 'UpdatedAt',
+		scopes: {
+			defaultUser: {
+				where: {
+					Name: process.env.DEFAULT_USER,
+				}
+			}
+		}
 	});
 	return Role;
 };

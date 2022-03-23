@@ -53,15 +53,9 @@ const getAll = async (_req, res, next) => {
 const createOne = async (req, res, next) => {
     try {
         const user = await User.create(req.body)
-        const userRole = await Role.findOne({
-            where: {
-                Name: 'User',
-            },
-        })
-        for (const rolePermission of await userRole.getRolePermissions()) {
-            await user.addRolePermission(rolePermission)
-        }
-        res.status(200).json(user)
+        const userRole = await Role.scope('defaultUser').findOne()
+        const userRolePerms = await user.addRolePermission(await userRole.getRolePermissions())
+        res.status(200).json(Object.assign({}, user, userRolePerms))
     } catch (e) {
         next(new httpException(500, e))
     }

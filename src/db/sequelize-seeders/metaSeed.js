@@ -1,4 +1,6 @@
 const crypto = require('crypto')
+const dotenv = require('dotenv')
+dotenv.config()
 const metaUser = [
     {
         Uuid: crypto.randomUUID(),
@@ -58,7 +60,7 @@ const metaMessage = [
 const metaRole = [
     {
         Uuid: crypto.randomUUID(),
-        Name: 'User',
+        Name: process.env.DEFAULT_USER,
         Description: 'Regular user with normal privileges',
     },
     {
