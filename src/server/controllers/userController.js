@@ -13,7 +13,7 @@ import models from 'Database/sequelize-models'
 import httpException from '../utils/httpException'
 import isUuid from '../utils/isUuid'
 
-const { User, Message, Reaction, Role, Permission, RolePermission, MessageReaction } = models
+const { User, Message, Reaction, Role, Permission, Tag, RolePermission, MessageReaction, MessageTag } = models
 
 const getOne = async (req, res, next) => {
     if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
@@ -164,6 +164,45 @@ const alterMessageReaction = async (req, res, next) => {
     }
 }
 
+const alterMessageTag = async (req, res, next) => {
+    if (!req.params.id || !req.params.messageId || !req.params.tagId) return next(new httpException(400, 'Missing ID Parameter'))
+    try {
+        const user = await User.scope('hideSensitive').findOne({
+            where: {
+                [isUuid(req.params.id) ? 'Uuid': 'Username']: req.params.id,
+            },
+        })
+        if (!user) return next(new httpException(404, 'Requested user does not exist'))
+        const message = await Message.findOne({
+            where: {
+                [isUuid(req.params.messageId) ? 'Uuid': 'Name']: req.params.messageId,
+            },
+        })
+        if (!message) return next(new httpException(404, 'Requested message does not exist'))
+        const tag = await Tag.findOne({
+            where: {
+                [isUuid(req.params.tagId) ? 'Uuid': 'Name']: req.params.tagId,
+            },
+        })
+        if (!tag) return next(new httpException(404, 'Requested tag does not exist'))
+        const messageTag = await MessageTag.findOne({
+            where: {
+                TagUuid: tag.Uuid,
+                MessageUuid: message.Uuid,
+            },
+        })
+        if (!messageTag) return next(new httpException(404, 'Requested message tag doesn\'t exist'))
+        if (await user.hasMessageTag(messageTag)) {
+            await user.removeMessageTag(messageTag)
+        } else {
+            await user.addMessageTag(messageTag)
+        }
+        res.status(200).json(await user.getMessageTags())
+    } catch (e) {
+        next(new httpException(500, e))
+    }
+}
+
 export {
     getOne,
     getAll,
@@ -171,5 +210,6 @@ export {
     updateOne,
     deleteOne,
     alterRolePermission,
-    alterMessageReaction
+    alterMessageReaction,
+    alterMessageTag,
 }

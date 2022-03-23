@@ -20,5 +20,6 @@ userRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; re
 userRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.deleteOne])
 userRouter.put('/:id/role/:roleId', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.alterRolePermission])
 userRouter.put('/:id/message/:messageId/reaction/:reactionId', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.alterMessageReaction])
+userRouter.put('/:id/message/:messageId/tag/:tagId', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.alterMessageTag])
 
 export default userRouter
