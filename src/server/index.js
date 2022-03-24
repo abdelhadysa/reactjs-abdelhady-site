@@ -37,6 +37,10 @@ import errorResponder from './middleware/errorResponder'
 
 import httpException from './utils/httpException'
 
+/* ANSI Color Codes */
+
+import * as ansiEscapeColor from './utils/ansiEscapeColor'
+
 /* Load Env */
 
 dotenv.config()
@@ -103,10 +107,12 @@ app
 
 // Connect to the database then start application
 sequelize.authenticate().then(async () => {
+    console.log(ansiEscapeColor.FgWhite)
+    console.log(ansiEscapeColor.FgWhite)
+    console.log(ansiEscapeColor.FgMagenta, 'Sequelize authentication successful.')
     app.listen(process.env.EXPRESS_PORT, () => {
-        console.log('\x1b[33m%s\x1b[0m', '|=========================================================|')
-        console.log('\x1b[30m%s\x1b[0m', `|==================[${process.env.WEBSITE_NAME}]==================|`)
-        console.log('\x1b[36m%s\x1b[0m', `|====================[localhost: ${process.env.EXPRESS_PORT}]====================|`)
-        console.log('\x1b[33m%s\x1b[0m', '|=========================================================|')
+        console.log(ansiEscapeColor.FgMagenta, `${process.env.WEBSITE_NAME} Listening on ${process.env.EXPRESS_PORT}`)
+        console.log(ansiEscapeColor.FgWhite)
+        console.log(ansiEscapeColor.FgWhite)
     })
 })

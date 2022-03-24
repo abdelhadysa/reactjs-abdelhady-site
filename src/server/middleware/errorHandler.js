@@ -6,12 +6,19 @@
     License file is included in the root directory and has the name "LICENSE"
 */
 
+/* ANSI Color Codes */
+
+import * as ansiEscapeColor from '../utils/ansiEscapeColor'
+
 // Ref: https://scoutapm.com/blog/express-error-handling
 
 export default function errorHandler(err, req, res, next) {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
-    console.error('\x1b[31m', err)
-    console.log('\x1b[31m', `URL: ${req.originalUrl}`)
-    console.log('\x1b[31m', `IP: ${ip}`)
+    console.group(err.name)
+        console.log(ansiEscapeColor.FgRed, err)
+        console.log(ansiEscapeColor.FgRed, `URL: ${req.originalUrl}`)
+        console.log(ansiEscapeColor.FgRed, `IP: ${ip}`)
+        console.log(ansiEscapeColor.FgWhite)
+    console.groupEnd()
     next(err)
 }
