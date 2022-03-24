@@ -47,8 +47,13 @@ const roleModel = (sequelize, DataTypes) => {
 			defaultUser: {
 				where: {
 					Name: process.env.DEFAULT_USER,
-				}
-			}
+				},
+			},
+			superUser: {
+				where: {
+					Name: process.env.SUPER_USER,
+				},
+			},
 		}
 	});
 	return Role;
