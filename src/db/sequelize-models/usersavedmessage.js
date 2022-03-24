@@ -1,28 +1,28 @@
 'use strict';
 const {
-  Model
+	Model
 } = require('sequelize');
 const userSavedMessageModel = (sequelize, DataTypes) => {
-  class UserSavedMessage extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-      UserSavedMessage.belongsTo(models.User)
-      UserSavedMessage.belongsTo(models.Message)
-    }
-  }
-  UserSavedMessage.init({
+	class UserSavedMessage extends Model {
+		/**
+		 * Helper method for defining associations.
+		 * This method is not a part of Sequelize lifecycle.
+		 * The `models/index` file will call this method automatically.
+		 */
+		static associate(models) {
+			// define association here
+			UserSavedMessage.belongsTo(models.User)
+			UserSavedMessage.belongsTo(models.Message)
+		}
+	}
+	UserSavedMessage.init({
 		Uuid: {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
 			allowNull: false,
 		},
-    UserUuid: {
+		UserUuid: {
 			type: DataTypes.UUID,
 			allowNull: false,	
 		},
@@ -30,10 +30,12 @@ const userSavedMessageModel = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			allowNull: false,	
 		}
-  }, {
-    sequelize,
-    modelName: 'UserSavedMessage',
-  });
-  return UserSavedMessage;
+	}, {
+		sequelize,
+		modelName: 'UserSavedMessage',
+		createdAt: 'CreatedAt',
+		updatedAt: 'UpdatedAt',
+	});
+	return UserSavedMessage;
 };
 export default userSavedMessageModel
