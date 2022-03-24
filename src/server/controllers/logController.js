@@ -23,6 +23,7 @@ const getOne = async (req, res, next) => {
                 ['Uuid']: req.params.id,
             },
         })
+        if (!log) return next(new httpException(404, 'No log found'))
         res.status(200).json(log)
     } catch (e) {
         next(new httpException(500, e))
@@ -32,6 +33,7 @@ const getOne = async (req, res, next) => {
 const getAll = async (_req, res, next) => {
     try {
         const logs = await Log.findAll({})
+        if (!logs.length) return next(new httpException(404, 'No logs found'))
         res.status(200).json(logs)
     } catch (e) {
         next(new httpException(500, e))
