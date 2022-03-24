@@ -16,6 +16,7 @@ const userModel = (sequelize, DataTypes) => {
 			User.belongsToMany(models.MessageTag, { through: models.UserMessageTag })
 			User.hasMany(models.UserMessageTag)
 			User.hasMany(models.UserSavedMessage)
+			User.hasMany(models.UserMessageReply)
 		}
 	}
 	User.init({

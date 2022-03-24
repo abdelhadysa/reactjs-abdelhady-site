@@ -21,6 +21,7 @@ import messageTagModel from './messagetag'
 import tagModel from './tag'
 import userMessageTagModel from './usermessagetag'
 import userSavedMessageModel from './usersavedmessage'
+import userMessageReplyModel from './usermessagereply'
 
 let sequelize;
 if (config.use_env_variable) {
@@ -44,6 +45,7 @@ const models = {
 	Tag: tagModel(sequelize, Sequelize.DataTypes),
 	UserMessageTag: userMessageTagModel(sequelize, Sequelize.DataTypes),
 	UserSavedMessage: userSavedMessageModel(sequelize, Sequelize.DataTypes),
+	UserMessageReply: userMessageReplyModel(sequelize, Sequelize.DataTypes),
 };
 
 //require.context(__dirname, false, /^((?!index).)*\.js$/)
