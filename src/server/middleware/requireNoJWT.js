@@ -8,14 +8,14 @@
 
 import dotenv from 'dotenv'
 import verifyJWT from '../utils/verifyJWT'
-import httpException from '../utils/httpException'
+import HttpException from '../utils/HttpException'
 import jwt from 'jsonwebtoken'
 
 dotenv.config()
 
 const requireNoJWT = (req, _res, next) => {
     const token = req.signedCookies.token
-    if (token && token !== 'undefined') return next(new httpException(400, 'User already logged in'))
+    if (token && token !== 'undefined') return next(new HttpException(400, 'User already logged in'))
     next()
 }
 

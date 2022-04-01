@@ -8,21 +8,21 @@
 
 import dotenv from 'dotenv'
 import verifyJWT from '../utils/verifyJWT'
-import httpException from '../utils/httpException'
+import HttpException from '../utils/HttpException'
 import jwt from 'jsonwebtoken'
 
 dotenv.config()
 
 const requireJWT = (req, _res, next) => {
     const token = req.signedCookies.token
-    if (!token || token === 'undefined') return next(new httpException(401, 'Access to restricted resource without token'))
+    if (!token || token === 'undefined') return next(new HttpException(401, 'Access to restricted resource without token'))
     verifyJWT(token)
     .then((_decoded) => {
         req.jwtToken = token
         req.decodedJWTPayload = _decoded
         next()
     })
-    .catch((e) => next(new httpException((e instanceof jwt.JsonWebTokenError) ? 401 : 400, e)))
+    .catch((e) => next(new HttpException((e instanceof jwt.JsonWebTokenError) ? 401 : 400, e)))
 }
 
 export default requireJWT
