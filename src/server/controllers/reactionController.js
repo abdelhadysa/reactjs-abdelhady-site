@@ -1,94 +1,108 @@
-/*
-    reactjs-abdelhady-site project created and maintained by Abdelhady "H2O" Salah.
-    (c) 2022 Abdelhady Salah <hadysalah1455@gmail.com> (https://github.com/h2o-creator/reactjs-abdelhady-site)
-    All Rights Reserved.
-    Licensed under the GNU GPL v3 License.
-    License file is included in the root directory and has the name "LICENSE"
-*/
+import models, { sequelize } from 'Database/sequelize-models'
+import HttpException from '../utils/HttpException'
+const { Reaction, Engagement, Message } = models
 
-const path = require('path')
+// Reaction
 
-import models from 'Database/sequelize-models'
-//import { Op } from 'sequelize'
-import httpException from '../utils/httpException'
-import isUuid from '../utils/isUuid'
-
-const { User, Message, Reaction, MessageReaction } = models
-
-const getOne = async (req, res, next) => {
-    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
+const getAll = async (req, res, next) => {
     try {
-        const reaction = await Reaction.findOne({
-            where: {
-                [isUuid(req.params.id) ? 'Uuid': 'Name']: req.params.id,
-            },
-            include: [Message, {
-                model: MessageReaction,
-                include: [User]
-            }]
-        })
-        if (!reaction) return next(new httpException(404, 'Reaction not found'))
-        res.status(200).json(reaction)
-    } catch (e) {
-        next(new httpException(500, e))
+        const reactions = await Reaction.findAll()
+        return res.status(200).json(reactions)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
-const getAll = async (_req, res, next) => {
+const getOne = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
     try {
-        const reaction = await Reaction.findAll({ include: [Message, {
-            model: MessageReaction,
-            include: [User],
-        }]})
-        if (!reaction.length) return next(new httpException(404, 'Reactions not found'))
-        res.status(200).json(reaction)
-    } catch (e) {
-        next(new httpException(500, e))
+        const reaction = await Reaction.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        return res.status(200).json(reaction)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 const createOne = async (req, res, next) => {
-    if (!req.body) return next(new httpException(400, 'Missing Request Body'))
+    if (!req.body) return next(new HttpException(400, 'Missing request body'))
+    const { Name, Points } = req.body
     try {
-        const reaction = await Reaction.create(req.body)
-        res.status(200).json(reaction)
-    } catch (e) {
-        next(new httpException(500, e))
+        const reaction = await Reaction.create({
+            Name,
+            Points,
+        })
+        return res.status(200).json(reaction)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 const updateOne = async (req, res, next) => {
-    if (!req.params.id || !req.body) return next(new httpException(400, 'Missing ID Parameter or Request Body'))
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
+    if (!req.body) return next(new HttpException(400, 'Missing request body'))
+    const { Name, Points } = req.body
     try {
-        const reaction = await Reaction.update(req.body, {
+        const reaction = await Reaction.update({
+            Name,
+            Points,
+        }, {
             where: {
-                [isUuid(req.params.id) ? 'Uuid': 'Name']: req.params.id,
-            },
+                Uuid: id,
+            }
         })
-        res.status(200).json(reaction)
-    } catch (e) {
-        next(new httpException(500, e))
+        return res.status(200).json(reaction)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 const deleteOne = async (req, res, next) => {
-    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
     try {
-        const reaction = await Reaction.delete({
+        const reaction = await Reaction.destroy({
             where: {
-                [isUuid(req.params.id) ? 'Uuid': 'Name']: req.params.id,
+                Uuid: id,
             }
         })
-        res.status(200).json(reaction)
-    } catch (e) {
-        next(new httpException(500, e))
+        return res.status(200).json(reaction)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 export {
-    getOne,
     getAll,
+    getOne,
     createOne,
     updateOne,
     deleteOne,
+}
+
+// Reaction Engagement
+
+const getMessages = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
+    try {
+        const engagement = await Engagement.findAll({
+            where: {
+                ReactionUuid: id,
+            },
+            include: Message
+        })
+        return res.status(200).json(engagement)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+export {
+    getMessages,
 }

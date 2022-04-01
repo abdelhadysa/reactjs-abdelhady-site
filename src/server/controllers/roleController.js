@@ -1,88 +1,145 @@
-/*
-    reactjs-abdelhady-site project created and maintained by Abdelhady "H2O" Salah.
-    (c) 2022 Abdelhady Salah <hadysalah1455@gmail.com> (https://github.com/h2o-creator/reactjs-abdelhady-site)
-    All Rights Reserved.
-    Licensed under the GNU GPL v3 License.
-    License file is included in the root directory and has the name "LICENSE"
-*/
+import models, { sequelize } from 'Database/sequelize-models'
+import HttpException from '../utils/HttpException'
+const { Role } = models
 
-const path = require('path')
+// Role
 
-import models from 'Database/sequelize-models'
-//import { Op } from 'sequelize'
-import httpException from '../utils/httpException'
-import isUuid from '../utils/isUuid'
-
-const { Role, Permission } = models
-
-const getOne = async (req, res, next) => {
-    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
+const getAll = async (req, res, next) => {
     try {
-        const role = await Role.findOne({
-            where: {
-                [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
-            },
-            include: [Permission],
-        })
-        res.status(200).json(role)
-    } catch (e) {
-        next(new httpException(500, e))
+        const roles = await Role.findAll()
+        return res.status(200).json(roles)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
-const getAll = async (_req, res, next) => {
+const getOne = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
     try {
-        const roles = await Role.findAll({ include: [Permission] })
-        res.status(200).json(roles)
-    } catch (e) {
-        next(new httpException(500, e))
+        const role = await Role.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        return res.status(200).json(role)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 const createOne = async (req, res, next) => {
-    if (!req.body) return next(new httpException(400, 'Missing Request Body'))
+    if (!req.body) return next(new HttpException(400, 'Missing request body'))
+    const { Name, Description, Order, Color, Super } = req.body
     try {
-        const role = await Role.create(req.body)
-        const userRole = await Role.scope('defaultUser').findOne()
-        const rolePerms = await role.addRolePermissions(await userRole.getRolePermissions())
-        res.status(200).json(Object.assign({}, role, { RolePermissions: rolePerms }))
-    } catch (e) {
-        next(new httpException(500, e))
+        const role = await Role.create({
+            Name,
+            Description,
+            Order,
+            Color,
+            Super,
+        })
+        return res.status(200).json(role)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 const updateOne = async (req, res, next) => {
-    if (!req.params.id || !req.body) return next(new httpException(400, 'Missing ID Parameter or Request Body'))
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
+    if (!req.body) return next(new HttpException(400, 'Missing request body'))
+    const { Name, Description, Order, Color, Super } = req.body
     try {
-        const role = await Role.update(req.body, {
+        const role = await Role.update({
+            Name,
+            Description,
+            Order,
+            Color,
+            Super,
+        }, {
             where: {
-                [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
-            },
+                Uuid: id,
+            }
         })
-        res.status(200).json(role)
-    } catch (e) {
-        next(new httpException(500, e))
+        return res.status(200).json(role)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 const deleteOne = async (req, res, next) => {
-    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
     try {
         const role = await Role.destroy({
             where: {
-                [isUuid(req.params.id) ? 'Uuid' : 'Name']: req.params.id,
-            },
+                Uuid: id,
+            }
         })
-        res.status(200).json(role)
-    } catch (e) {
-        next(new httpException(500, e))
+        return res.status(200).json(role)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 export {
-    getOne,
     getAll,
+    getOne,
     createOne,
     updateOne,
     deleteOne,
+}
+
+// Role Right
+
+const getPermissions = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
+    try {
+        const role = await Role.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        return res.status(200).json(await role.getPermissions())
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const createPermission = async (req, res, next) => {
+    if (!req.params.id || !req.params.permissionId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, permissionId } = req.params
+    try {
+        const role = await Role.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        return res.status(200).json(await role.addPermission(permissionId))
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const deletePermission = async (req, res, next) => {
+    if (!req.params.id || !req.params.permissionId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, permissionId } = req.params
+    try {
+        const role = await Role.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        return res.status(200).json(await role.removePermission(permissionId))
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+export {
+    getPermissions,
+    createPermission,
+    deletePermission,
 }
