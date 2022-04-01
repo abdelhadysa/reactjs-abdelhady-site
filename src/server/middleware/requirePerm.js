@@ -9,33 +9,50 @@
 const path = require('path')
 
 import models from 'Database/sequelize-models'
-import httpException from '../utils/httpException'
+import HttpException from '../utils/HttpException'
+import isUuid from '../utils/isUuid'
 
-const { User, Role, Permission, RolePermission } = models
+const { User, Permission } = models
 
-const requirePerm = async (req, res, next) => {
-    if (!req.jwtToken || !req.decodedJWTPayload) return next(new httpException(401, 'Missing payload data'))
-    const { decodedJWTPayload, permNeeded } = req
-    try {
-        const user = await User.findOne({
-            where: {
-                Username: decodedJWTPayload.username,
-            },
-        })
-        if (!user) return next(new httpException(400, 'User no longer exists'))
-        const permission = await Permission.findOne({
-            where: {
-                Name: permNeeded,
-            },
-        })
-        if (!permission) return next(new httpException(404, 'Permission not found'))
-        const userRolePermissions = await user.getRolePermissions()
-        for (const userRolePermission of userRolePermissions) {
-            if (userRolePermission.PermissionUuid === permission.Uuid) return next()
+const requirePerm = (permNeeded) => {
+    return async (req, res, next) => {
+        if (!req.jwtToken || !req.decodedJWTPayload) return next(new HttpException(401, 'Missing payload data'))
+        const { decodedJWTPayload } = req
+        if (!isUuid(decodedJWTPayload.uuid)) return next(new HttpException(400, 'Corrupted payload data'))
+        try {
+            const user = await User.findOne({
+                where: {
+                    Uuid: decodedJWTPayload.uuid,
+                },
+            })
+            if (!user) throw new Error('User does not exist')
+            const permission = await Permission.findOne({
+                where: {
+                    Name: permNeeded,
+                },
+            })
+            if (!permission) throw new Error('Permission does not exist')
+            const roles = await user.getRoles()
+            if (!roles.length) throw new Error('User roles not found')
+            for (const role of roles) {
+                if (await role.hasPermission(permission)) {
+                    req.authorized = true
+                    req.permissionNeeded = permNeeded
+                    req.roleOfAuthority = role.Name
+                    if (role.Super === true) {
+                        req.superAccess = true
+                        break
+                    }
+                    req.superAccess = false
+                }
+            }
+            if (req.authorized === true) {
+                console.log(`Authorized User ${user.Username} with Role ${req.roleOfAuthority} (Super: ${req.superAccess}) and Permission ${req.permissionNeeded}`)
+                return next()
+            } else return next(new HttpException(401, 'User not allowed to access this resource'))
+        } catch(e) {
+            return next(new HttpException(500, e))
         }
-        next(new httpException(401, 'Unauthorized user'))
-    } catch (e) {
-        return next(new httpException(500, e))
     }
 }
 
