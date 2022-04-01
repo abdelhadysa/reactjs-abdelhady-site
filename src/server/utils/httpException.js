@@ -6,13 +6,13 @@
     License file is included in the root directory and has the name "LICENSE"
 */
 
-class httpException extends Error {
+class HttpException extends Error {
     constructor (status, message) {
         super()
         this.name = this.constructor.name
         this.statusCode = status
-        this.message = `HTTP ERROR ${status}: ${message}`
+        this.message = `${message} - HTTP ${status}`
     }
 }
 
-export default httpException
+export default HttpException

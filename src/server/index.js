@@ -35,7 +35,7 @@ import errorResponder from './middleware/errorResponder'
 
 /* Errors */
 
-import httpException from './utils/httpException'
+import HttpException from './utils/HttpException'
 
 /* ANSI Color Codes */
 
@@ -97,7 +97,7 @@ app
     .use('/api', apiRouter)
     .get('*', (_req, res, next) => {
         fs.readFile(path.resolve('dist/index.html'), "utf8", (err, data) => {
-            if (err) return next(new httpException(500, err))
+            if (err) return next(new HttpException(500, err))
             return res.status(200).send(data.replace('<div id="root"></div>',
             `<div id="root">${ReactDOMServer.renderToString(<App />)}</div>`))
         })
