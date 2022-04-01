@@ -14,7 +14,9 @@ module.exports = {
 				allowNull: false,
 			},
 			Points: {
-				type: Sequelize.INTEGER
+				type: Sequelize.INTEGER,
+				allowNull: false,
+				defaultValue: 1,
 			},
 			CreatedAt: {
 				allowNull: false,

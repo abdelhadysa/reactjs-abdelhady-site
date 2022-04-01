@@ -1,27 +1,34 @@
 'use strict';
 module.exports = {
 	async up(queryInterface, Sequelize) {
-		await queryInterface.createTable('Tags', {
+		await queryInterface.createTable('Grants', {
 			Uuid: {
 				type: Sequelize.UUID,
 				defaultValue: Sequelize.UUIDV4,
 				primaryKey: true,
 				allowNull: false,
 			},
-			Name: {
-				type: Sequelize.STRING,
-				unique: true,
+			UserUuid: {
+				type: Sequelize.UUID,
 				allowNull: false,
+				references: {
+					model: 'Users',
+					key: 'Uuid',
+					as: 'UserUuid',
+				},
+				onDelete: 'CASCADE',
+				onUpdate: 'CASCADE',
 			},
-			Color: {
-				type: Sequelize.STRING,
+			RoleUuid: {
+				type: Sequelize.UUID,
 				allowNull: false,
-				defaultValue: '#000000',
-			},
-			Featured: {
-				type: Sequelize.BOOLEAN,
-				allowNull: false,
-				defaultValue: false,
+				references: {
+					model: 'Roles',
+					key: 'Uuid',
+					as: 'RoleUuid'
+				},
+				onDelete: 'CASCADE',
+				onUpdate: 'CASCADE',
 			},
 			CreatedAt: {
 				allowNull: false,
@@ -34,6 +41,6 @@ module.exports = {
 		});
 	},
 	async down(queryInterface, Sequelize) {
-		await queryInterface.dropTable('Tags');
+		await queryInterface.dropTable('Grants');
 	}
 };

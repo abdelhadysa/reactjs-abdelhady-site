@@ -14,7 +14,23 @@ module.exports = {
 				allowNull: false,
 			},
 			Description: {
-				type: Sequelize.STRING
+				type: Sequelize.STRING,
+				allowNull: true,
+			},
+			Order: {
+				type: Sequelize.INTEGER,
+				allowNull: false,
+				defaultValue: 0,
+			},
+			Color: {
+				type: Sequelize.STRING,
+				allowNull: false,
+				defaultValue: '#000000',
+			},
+			Super: {
+				type: Sequelize.BOOLEAN,
+				allowNull: false,
+				defaultValue: false,
 			},
 			CreatedAt: {
 				allowNull: false,

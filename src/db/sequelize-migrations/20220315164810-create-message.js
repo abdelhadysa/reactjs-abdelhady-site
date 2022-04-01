@@ -16,16 +16,6 @@ module.exports = {
 				type: Sequelize.STRING,
 				allowNull: false,
 			},
-			UserUuid: {
-				type: Sequelize.UUID,
-				allowNull: false,
-				onDelete: 'CASCADE',
-				references: {
-					model: 'Users',
-					key: 'Uuid',
-					as: 'UserUuid',
-				},
-			},
 			CreatedAt: {
 				allowNull: false,
 				type: Sequelize.DATE

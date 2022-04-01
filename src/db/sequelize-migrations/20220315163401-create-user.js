@@ -13,25 +13,25 @@ module.exports = {
 				unique: true,
 				allowNull: false,
 			},
-			Email: {
-				type: Sequelize.STRING,
-				unique: true,
-				allowNull: false,
-			},
 			PasswordHash: {
 				type: Sequelize.STRING,
 				allowNull: false,
 			},
-			LastVisit: {
-				type: Sequelize.DATE,
+			Email: {
+				type: Sequelize.STRING,
+				unique: true,
 				allowNull: true,
 			},
 			IpAddress: {
 				type: Sequelize.STRING,
-				allowNull: false,
+				allowNull: true,
 			},
 			Device: {
 				type: Sequelize.STRING,
+				allowNull: true,
+			},
+			LastVisit: {
+				type: Sequelize.DATE,
 				allowNull: true,
 			},
 			AvatarUrl: {
