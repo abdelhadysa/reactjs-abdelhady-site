@@ -1,6 +1,6 @@
 'use strict';
 import { Model } from 'sequelize'
-const permissionModel = (sequelize, DataTypes) => {
+const Permission = (sequelize, DataTypes) => {
 	class Permission extends Model {
 		/**
 		 * Helper method for defining associations.
@@ -8,8 +8,11 @@ const permissionModel = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Permission.belongsToMany(models.Role, { through: models.RolePermission })
-			Permission.hasMany(models.RolePermission)
+			// Right
+			Permission.hasMany(models.Right, { foreignKey: { onDelete: 'CASCADE', name: 'PermissionUuid', allowNull: false } })
+
+			// Role
+			Permission.belongsToMany(models.Role, { through: models.Right })
 		}
 	}
 	Permission.init({
@@ -30,9 +33,8 @@ const permissionModel = (sequelize, DataTypes) => {
 		},
 		Description: {
 			type: DataTypes.STRING,
-			allowNull: false,
+			allowNull: true,
 			validate: {
-				notEmpty: true,
 				is: /(^[A-Za-z0-9_\S ]+)/,
 			},
 		},
@@ -45,4 +47,4 @@ const permissionModel = (sequelize, DataTypes) => {
 	return Permission;
 };
 
-export default permissionModel
+export default Permission

@@ -7,21 +7,20 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 const config = require('../sequelize-config/config.js')[env];
 
-import userModel from './user'
-import messageModel from './message'
-import roleModel from './role'
-import permissionModel from './permission'
-import rolePermissionModel from './rolepermission'
-import userRolePermissionModel from './userrolepermission'
-import reactionModel from './reaction'
-import messageReactionModel from './messagereaction'
-import userMessageReactionModel from './usermessagereaction'
-import logModel from './log'
-import messageTagModel from './messagetag'
-import tagModel from './tag'
-import userMessageTagModel from './usermessagetag'
-import userSavedMessageModel from './usersavedmessage'
-import userMessageReplyModel from './usermessagereply'
+import Engagement from './engagement'
+import Favorite from './favorite'
+import Grant from './grant'
+import List from './list'
+import Log from './log'
+import Message from './message'
+import Permission from './permission'
+import Post from './post'
+import Reply from './reply'
+import Right from './right'
+import Role from './role'
+import Tag from './tag'
+import User from './user'
+import Reaction from './reaction'
 
 let sequelize;
 if (config.use_env_variable) {
@@ -31,21 +30,20 @@ if (config.use_env_variable) {
 }
 
 const models = {
-	User: userModel(sequelize, Sequelize.DataTypes),
-	Role: roleModel(sequelize, Sequelize.DataTypes),
-	Permission: permissionModel(sequelize, Sequelize.DataTypes),
-	RolePermission: rolePermissionModel(sequelize, Sequelize.DataTypes),
-	UserRolePermission: userRolePermissionModel(sequelize, Sequelize.DataTypes),
-	Message: messageModel(sequelize, Sequelize.DataTypes),
-	Reaction: reactionModel(sequelize, Sequelize.DataTypes),
-	MessageReaction: messageReactionModel(sequelize, Sequelize.DataTypes),
-	UserMessageReaction: userMessageReactionModel(sequelize, Sequelize.DataTypes),
-	Log: logModel(sequelize, Sequelize.DataTypes),
-	MessageTag: messageTagModel(sequelize, Sequelize.DataTypes),
-	Tag: tagModel(sequelize, Sequelize.DataTypes),
-	UserMessageTag: userMessageTagModel(sequelize, Sequelize.DataTypes),
-	UserSavedMessage: userSavedMessageModel(sequelize, Sequelize.DataTypes),
-	UserMessageReply: userMessageReplyModel(sequelize, Sequelize.DataTypes),
+	User: User(sequelize, Sequelize.DataTypes),
+	Message: Message(sequelize, Sequelize.DataTypes),
+	Reaction: Reaction(sequelize, Sequelize.DataTypes),
+	Role: Role(sequelize, Sequelize.DataTypes),
+	Permission: Permission(sequelize, Sequelize.DataTypes),
+	Tag: Tag(sequelize, Sequelize.DataTypes),
+	Log: Log(sequelize, Sequelize.DataTypes),
+	Post: Post(sequelize, Sequelize.DataTypes),
+	Reply: Reply(sequelize, Sequelize.DataTypes),
+	Engagement: Engagement(sequelize, Sequelize.DataTypes),
+	Favorite: Favorite(sequelize, Sequelize.DataTypes),
+	Grant: Grant(sequelize, Sequelize.DataTypes),
+	List: List(sequelize, Sequelize.DataTypes),
+	Right: Right(sequelize, Sequelize.DataTypes),
 };
 
 //require.context(__dirname, false, /^((?!index).)*\.js$/)

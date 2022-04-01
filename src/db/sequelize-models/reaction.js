@@ -2,7 +2,7 @@
 const {
 	Model
 } = require('sequelize');
-const reactionModel = (sequelize, DataTypes) => {
+const Reaction = (sequelize, DataTypes) => {
 	class Reaction extends Model {
 		/**
 		 * Helper method for defining associations.
@@ -10,8 +10,8 @@ const reactionModel = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Reaction.belongsToMany(models.Message, { through: models.MessageReaction })
-			Reaction.hasMany(models.MessageReaction)
+			// Engagement
+			Reaction.hasMany(models.Engagement, { foreignKey: { onDelete: 'CASCADE', name: 'ReactionUuid', allowNull: false } })
 		}
 	}
 	Reaction.init({
@@ -30,7 +30,15 @@ const reactionModel = (sequelize, DataTypes) => {
 				is: /(^[A-Za-z0-9_\S ]+)/,
 			},
 		},
-		Points: DataTypes.INTEGER
+		Points: {
+			allowNull: false,
+			type: DataTypes.INTEGER,
+			defaultValue: 1,
+			validate: {
+				min: 1,
+				max: 100
+			},
+		},
 	}, {
 		sequelize,
 		modelName: 'Reaction',
@@ -40,4 +48,4 @@ const reactionModel = (sequelize, DataTypes) => {
 	return Reaction;
 };
 
-export default reactionModel
+export default Reaction

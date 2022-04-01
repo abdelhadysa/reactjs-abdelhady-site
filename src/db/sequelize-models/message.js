@@ -1,6 +1,6 @@
 'use strict';
 import { Model } from 'sequelize'
-const messageModel = (sequelize, DataTypes) => {
+const Message = (sequelize, DataTypes) => {
 	class Message extends Model {
 		/**
 		 * Helper method for defining associations.
@@ -8,13 +8,17 @@ const messageModel = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Message.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { allowNull: false } })
-			Message.belongsToMany(models.Reaction, { through: models.MessageReaction })
-			Message.hasMany(models.MessageReaction)
-			Message.belongsToMany(models.Tag, { through: models.MessageTag })
-			Message.hasMany(models.MessageTag)
-			Message.hasMany(models.UserSavedMessage)
-			Message.hasMany(models.UserMessageReply)
+			// Post
+			Message.hasOne(models.Post, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+
+			// Reply
+			Message.hasOne(models.Reply, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+
+			// Engagement
+			Message.hasMany(models.Engagement, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+
+			// List
+			Message.hasMany(models.List, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
 		}
 	}
 	Message.init({
@@ -38,11 +42,6 @@ const messageModel = (sequelize, DataTypes) => {
 				notEmpty: true,
 			},
 		},
-		UserUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-			onDelete: 'CASCADE',
-		},
 	}, {
 		sequelize,
 		modelName: 'Message',
@@ -52,4 +51,4 @@ const messageModel = (sequelize, DataTypes) => {
 	return Message;
 };
 
-export default messageModel
+export default Message

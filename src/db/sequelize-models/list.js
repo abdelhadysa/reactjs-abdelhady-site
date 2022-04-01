@@ -2,22 +2,22 @@
 const {
 	Model
 } = require('sequelize');
-const Tag = (sequelize, DataTypes) => {
-	class Tag extends Model {
+const List = (sequelize, DataTypes) => {
+	class List extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			// Favorite
-			Tag.hasMany(models.Favorite, { foreignKey: { onDelete: 'CASCADE', name: 'TagUuid', allowNull: false } })
+			// Message
+			List.belongsTo(models.Message, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
 
-			// List
-			Tag.hasMany(models.List, { foreignKey: { onDelete: 'CASCADE', name: 'TagUuid', allowNull: false } })
+			// Tag
+			List.belongsTo(models.Tag, { foreignKey: { onDelete: 'CASCADE', name: 'TagUuid', allowNull: false } })
 		}
 	}
-	Tag.init({
+	List.init({
 		Uuid: {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
@@ -30,28 +30,37 @@ const Tag = (sequelize, DataTypes) => {
 			allowNull: false,
 			validate: {
 				notEmpty: true,
-				is: /(^[A-Za-z0-9_]+)/,
+				is: /(^[A-Za-z0-9_\S ]+)/,
 			},
+		},
+		Order: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			defaultValue: 0,
 		},
 		Color: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
+				notEmpty: true,
 				is: /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
 			},
 			defaultValue: '#000000',
 		},
-		Featured: {
-			type: DataTypes.BOOLEAN,
+		MessageUuid: {
+			type: DataTypes.UUID,
 			allowNull: false,
-			defaultValue: false,
+		},
+		TagUuid: {
+			type: DataTypes.UUID,
+			allowNull: false,
 		}
 	}, {
 		sequelize,
-		modelName: 'Tag',
+		modelName: 'List',
 		createdAt: 'CreatedAt',
 		updatedAt: 'UpdatedAt',
 	});
-	return Tag;
+	return List;
 };
-export default Tag
+export default List

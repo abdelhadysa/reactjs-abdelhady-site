@@ -1,6 +1,6 @@
 'use strict';
 import { Model } from 'sequelize'
-const userModel = (sequelize, DataTypes) => {
+const User = (sequelize, DataTypes) => {
 	class User extends Model {
 		/**
 		 * Helper method for defining associations.
@@ -8,15 +8,25 @@ const userModel = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			User.hasMany(models.Message, { onDelete: 'CASCADE', foreignKey: { allowNull: false, name: 'UserUuid' } })
-			User.belongsToMany(models.RolePermission, { through: models.UserRolePermission })
-			User.belongsToMany(models.MessageReaction, { through: models.UserMessageReaction })
-			User.hasMany(models.UserRolePermission)
-			User.hasMany(models.UserMessageReaction)
-			User.belongsToMany(models.MessageTag, { through: models.UserMessageTag })
-			User.hasMany(models.UserMessageTag)
-			User.hasMany(models.UserSavedMessage)
-			User.hasMany(models.UserMessageReply)
+			// Post
+			User.hasMany(models.Post, { as: 'PostAuthor', foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
+			User.hasMany(models.Post, { as: 'PostLastEditor', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
+
+			// Reply
+			User.hasMany(models.Reply, { as: 'ReplyAuthor', foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
+			User.hasMany(models.Reply, { as: 'ReplyLastEditor', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
+
+			// Grant
+			User.hasMany(models.Grant, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+
+			// Engagement
+			User.hasMany(models.Engagement, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+
+			// Favorite
+			User.hasMany(models.Favorite, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+
+			// Role
+			User.belongsToMany(models.Role, { through: models.Grant })
 		}
 	}
 	User.init({
@@ -33,36 +43,8 @@ const userModel = (sequelize, DataTypes) => {
 			validate: {
 				notEmpty: true,
 				is: /(^[A-Za-z0-9_]+)/,
+				len: [3, 15],
 			},
-		},
-		Email: {
-			type: DataTypes.STRING,
-			unique: true,
-			allowNull: false,
-			validate: {
-				notEmpty: true,
-				isEmail: true,
-			},
-		},
-		LastVisit: {
-			type: DataTypes.DATE,
-			allowNull: true,
-		},
-		IpAddress: {
-			type: DataTypes.STRING,
-			allowNull: false,
-			validate: {
-				notEmpty: true,
-				isIP: true,
-			},
-		},
-		Device: {
-			type: DataTypes.STRING,
-			allowNull: true,
-		},
-		AvatarUrl: {
-			type: DataTypes.STRING,
-			allowNull: true,
 		},
 		PasswordHash: {
 			type: DataTypes.STRING,
@@ -70,7 +52,36 @@ const userModel = (sequelize, DataTypes) => {
 			validate: {
 				notEmpty: true,
 			}
-		}
+		},
+		Email: {
+			type: DataTypes.STRING,
+			unique: true,
+			allowNull: true,
+			validate: {
+				isEmail: true,
+				len: [5, 320],
+			},
+		},
+		IpAddress: {
+			type: DataTypes.STRING,
+			allowNull: true,
+			validate: {
+				isIP: true,
+				len: [6, 39],
+			},
+		},
+		Device: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		LastVisit: {
+			type: DataTypes.DATE,
+			allowNull: true,
+		},
+		AvatarUrl: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
 	}, {
 		sequelize,
 		modelName: 'User',
@@ -87,4 +98,4 @@ const userModel = (sequelize, DataTypes) => {
 	return User;
 };
 
-export default userModel
+export default User

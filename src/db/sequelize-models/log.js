@@ -2,7 +2,7 @@
 const {
 	Model
 } = require('sequelize');
-const logModel = (sequelize, DataTypes) => {
+const Log = (sequelize, DataTypes) => {
 	class Log extends Model {
 		/**
 		 * Helper method for defining associations.
@@ -35,4 +35,4 @@ const logModel = (sequelize, DataTypes) => {
 	});
 	return Log;
 };
-export default logModel
+export default Log
