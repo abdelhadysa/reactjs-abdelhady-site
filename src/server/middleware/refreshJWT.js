@@ -11,7 +11,7 @@
 import dotenv from 'dotenv'
 import verifyJWT from '../utils/verifyJWT'
 import signJWT from '../utils/signJWT'
-import httpException from '../utils/httpException'
+import HttpException from '../utils/HttpException'
 import jwt from 'jsonwebtoken'
 
 dotenv.config()
@@ -37,12 +37,12 @@ const refreshJWT = async (req, res, next) => {
         // or the current timestamp exceeds the decoded timestamp
         // don't renew the token
         if (decoded.exp - unixTimestamp > process.env.JWT_REFRESHIN) return next()
-        const { username } = decoded
-        const newToken = await signJWT({ username }) // Renew token
+        const { uuid } = decoded
+        const newToken = await signJWT({ uuid }) // Renew token
         res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true }) // Renew cookie
         return next()
     } catch (e) { 
-        return next(new httpException((e instanceof jwt.JsonWebTokenError) ? 401 : 400, e))
+        return next(new HttpException((e instanceof jwt.JsonWebTokenError) ? 401 : 400, e))
     }
 }
 
