@@ -10,13 +10,15 @@ const path = require('path')
 const express = require('express')
 import * as reactionController from '../controllers/reactionController'
 import requirePerm from '../middleware/requirePerm'
+import { D_REACTION_PERM } from '../utils/defaults'
 
 const reactionRouter = express.Router()
 
-reactionRouter.post('/', [(req, _res, next) => { req.permNeeded = 'Create reaction'; return next() }, requirePerm, reactionController.createOne])
-reactionRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get reaction'; return next() }, requirePerm, reactionController.getOne])
-reactionRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get reactions'; return next() }, requirePerm, reactionController.getAll])
-reactionRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter reaction'; return next() }, requirePerm, reactionController.updateOne])
-reactionRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter reaction'; return next() }, requirePerm, reactionController.deleteOne])
+reactionRouter.get('/', [requirePerm(D_REACTION_PERM.GET_ALL), reactionController.getAll])
+reactionRouter.get('/:id', [requirePerm(D_REACTION_PERM.GET), reactionController.getOne])
+reactionRouter.post('/', [requirePerm(D_REACTION_PERM.CREATE), reactionController.createOne])
+reactionRouter.put('/:id', [requirePerm(D_REACTION_PERM.UPDATE), reactionController.updateOne])
+reactionRouter.delete('/:id', [requirePerm(D_REACTION_PERM.DELETE), reactionController.deleteOne])
+reactionRouter.get('/:id/message', [requirePerm(D_REACTION_PERM.GET_MESSAGES), reactionController.getMessages])
 
 export default reactionRouter

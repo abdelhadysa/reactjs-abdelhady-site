@@ -10,16 +10,36 @@ const path = require('path')
 const express = require('express')
 import * as userController from '../controllers/userController'
 import requirePerm from '../middleware/requirePerm'
+import { D_USER_PERM } from '../utils/defaults'
 
 const userRouter = express.Router()
 
-userRouter.post('/', [(req, _res, next) => { req.permNeeded = 'Create user'; return next() }, requirePerm, userController.createOne])
-userRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get user'; return next() }, requirePerm, userController.getOne])
-userRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get users'; return next() }, requirePerm, userController.getAll])
-userRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.updateOne])
-userRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.deleteOne])
-userRouter.put('/:id/role/:roleId', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.alterRolePermission])
-userRouter.put('/:id/message/:messageId/reaction/:reactionId', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.alterMessageReaction])
-userRouter.put('/:id/message/:messageId/tag/:tagId', [(req, _res, next) => { req.permNeeded = 'Alter user'; return next() }, requirePerm, userController.alterMessageTag])
+userRouter.get('/', [requirePerm(D_USER_PERM.GET_ALL), userController.getAll])
+userRouter.get('/:id', [requirePerm(D_USER_PERM.GET), userController.getOne])
+userRouter.post('/', [requirePerm(D_USER_PERM.CREATE), userController.createOne])
+userRouter.put('/:id', [requirePerm(D_USER_PERM.UPDATE), userController.updateOne])
+userRouter.delete('/:id', [requirePerm(D_USER_PERM.DELETE), userController.deleteOne])
+
+userRouter.get('/:id/post', [requirePerm(D_USER_PERM.GET_POSTS), userController.getPosts])
+userRouter.post('/:id/post', [requirePerm(D_USER_PERM.CREATE_POST), userController.createPost])
+userRouter.put('/:id/post/:postId', [requirePerm(D_USER_PERM.UPDATE_POST), userController.updatePost])
+userRouter.delete('/:id/post/:postId', [requirePerm(D_USER_PERM.DELETE_POST), userController.deletePost])
+
+userRouter.get('/:id/reply', [requirePerm(D_USER_PERM.GET_REPLIES), userController.getReplies])
+userRouter.post('/:id/reply/:postId', [requirePerm(D_USER_PERM.CREATE_REPLY), userController.createReply])
+userRouter.put('/:id/reply/:replyId', [requirePerm(D_USER_PERM.UPDATE_REPLY), userController.updateReply])
+userRouter.delete('/:id/reply/:replyId', [requirePerm(D_USER_PERM.DELETE_REPLY), userController.deleteReply])
+
+userRouter.get('/:id/role', [requirePerm(D_USER_PERM.GET_ROLES), userController.getRoles])
+userRouter.post('/:id/role/:roleId', [requirePerm(D_USER_PERM.CREATE_ROLE), userController.createRole])
+userRouter.delete('/:id/role/:roleId', [requirePerm(D_USER_PERM.DELETE_ROLE), userController.deleteRole])
+
+userRouter.get('/:id/reaction', [requirePerm(D_USER_PERM.GET_REACTIONS), userController.getReactions])
+userRouter.post('/:id/reaction/:reactionId/:messageId', [requirePerm(D_USER_PERM.CREATE_REACTION), userController.createReaction])
+userRouter.delete('/:id/reaction/:reactionId/:messageId', [requirePerm(D_USER_PERM.DELETE_REACTION), userController.deleteReaction])
+
+userRouter.get('/:id/tag', [requirePerm(D_USER_PERM.GET_TAGS), userController.getTags])
+userRouter.post('/:id/tag/:tagId', [requirePerm(D_USER_PERM.CREATE_TAG), userController.createTag])
+userRouter.delete('/:id/tag/:tagId', [requirePerm(D_USER_PERM.DELETE_TAG), userController.deleteTag])
 
 export default userRouter

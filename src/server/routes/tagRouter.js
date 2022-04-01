@@ -10,13 +10,15 @@ const path = require('path')
 const express = require('express')
 import * as tagController from '../controllers/tagController'
 import requirePerm from '../middleware/requirePerm'
+import { D_TAG_PERM } from '../utils/defaults'
 
 const tagRouter = express.Router()
 
-tagRouter.post('/', [(req, _res, next) => { req.permNeeded = 'Create tag'; return next() }, requirePerm, tagController.createOne])
-tagRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get tag'; return next() }, requirePerm, tagController.getOne])
-tagRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get tags'; return next() }, requirePerm, tagController.getAll])
-tagRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter tag'; return next() }, requirePerm, tagController.updateOne])
-tagRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter tag'; return next() }, requirePerm, tagController.deleteOne])
+tagRouter.get('/', [requirePerm(D_TAG_PERM.GET_ALL), tagController.getAll])
+tagRouter.get('/:id', [requirePerm(D_TAG_PERM.GET), tagController.getOne])
+tagRouter.post('/', [requirePerm(D_TAG_PERM.CREATE), tagController.createOne])
+tagRouter.put('/:id', [requirePerm(D_TAG_PERM.UPDATE), tagController.updateOne])
+tagRouter.delete('/:id', [requirePerm(D_TAG_PERM.DELETE), tagController.deleteOne])
+tagRouter.get('/:id/message', [requirePerm(D_TAG_PERM.GET_MESSAGES), tagController.getMessages])
 
 export default tagRouter

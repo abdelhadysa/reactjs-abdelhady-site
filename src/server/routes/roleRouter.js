@@ -10,13 +10,16 @@ const path = require('path')
 const express = require('express')
 import * as roleController from '../controllers/roleController'
 import requirePerm from '../middleware/requirePerm'
+import { D_ROLE_PERM } from '../utils/defaults'
 
 const roleRouter = express.Router()
 
-roleRouter.post('/', [(req, _res, next) => { req.permNeeded = 'Create role'; return next() }, requirePerm, roleController.createOne])
-roleRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get role'; return next() }, requirePerm, roleController.getOne])
-roleRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get roles'; return next() }, requirePerm, roleController.getAll])
-roleRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter role'; return next() }, requirePerm, roleController.updateOne])
-roleRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter role'; return next() }, requirePerm, roleController.deleteOne])
+roleRouter.get('/', [requirePerm(D_ROLE_PERM.GET_ALL), roleController.getAll])
+roleRouter.get('/:id', [requirePerm(D_ROLE_PERM.GET), roleController.getOne])
+roleRouter.post('/', [requirePerm(D_ROLE_PERM.CREATE), roleController.createOne])
+roleRouter.delete('/:id', [requirePerm(D_ROLE_PERM.DELETE), roleController.deleteOne])
+roleRouter.get('/:id/permission', [requirePerm(D_ROLE_PERM.GET_PERMISSIONS), roleController.getPermissions])
+roleRouter.post('/:id/permission/:permissionId', [requirePerm(D_ROLE_PERM.CREATE_PERMISSION), roleController.createPermission])
+roleRouter.delete('/:id/permission/:permissionId', [requirePerm(D_ROLE_PERM.DELETE_PERMISSION), roleController.deletePermission])
 
 export default roleRouter

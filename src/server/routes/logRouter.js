@@ -10,13 +10,14 @@ const path = require('path')
 const express = require('express')
 import * as logController from '../controllers/logController'
 import requirePerm from '../middleware/requirePerm'
+import { D_LOG_PERM } from '../utils/defaults'
 
 const logRouter = express.Router()
 
-logRouter.post('/', [(req, _res, next) => { req.permNeeded = 'Create log'; return next() }, requirePerm, logController.createOne])
-logRouter.get('/:id', [(req, _res, next) => { req.permNeeded = 'Get log'; return next() }, requirePerm, logController.getOne])
-logRouter.get('/', [(req, _res, next) => { req.permNeeded = 'Get logs'; return next() }, requirePerm, logController.getAll])
-logRouter.put('/:id', [(req, _res, next) => { req.permNeeded = 'Alter log'; return next() }, requirePerm, logController.updateOne])
-logRouter.delete('/:id', [(req, _res, next) => { req.permNeeded = 'Alter log'; return next() }, requirePerm, logController.deleteOne])
+logRouter.get('/', [requirePerm(D_LOG_PERM.GET_ALL), logController.getAll])
+logRouter.get('/:id', [requirePerm(D_LOG_PERM.GET), logController.getOne])
+logRouter.post('/', [requirePerm(D_LOG_PERM.CREATE), logController.createOne])
+logRouter.put('/:id', [requirePerm(D_LOG_PERM.UPDATE), logController.updateOne])
+logRouter.delete('/:id', [requirePerm(D_LOG_PERM.DELETE), logController.deleteOne])
 
 export default logRouter
