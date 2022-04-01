@@ -1,215 +1,545 @@
-/*
-    reactjs-abdelhady-site project created and maintained by Abdelhady "H2O" Salah.
-    (c) 2022 Abdelhady Salah <hadysalah1455@gmail.com> (https://github.com/h2o-creator/reactjs-abdelhady-site)
-    All Rights Reserved.
-    Licensed under the GNU GPL v3 License.
-    License file is included in the root directory and has the name "LICENSE"
-*/
+import models, { sequelize } from 'Database/sequelize-models'
+import HttpException from '../utils/HttpException'
+import crypto from 'crypto'
+import { hashPass } from '../utils/bcryptManager'
 
-const path = require('path')
+// User
 
-import models from 'Database/sequelize-models'
-//import { Op } from 'sequelize'
-import httpException from '../utils/httpException'
-import isUuid from '../utils/isUuid'
+const { User, Message, Post, Reply, Engagement, Favorite } = models
 
-const { User, Message, Reaction, Role, Permission, Tag, RolePermission, MessageReaction, MessageTag } = models
-
-const getOne = async (req, res, next) => {
-    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
+const getAll = async (req, res, next) => {
     try {
-        const user = await User.scope('hideSensitive').findOne({
-            where: {
-                [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
-            },
-            include: [Message, {
-                model: RolePermission,
-                include: [Role, Permission]
-            }, {
-                model: MessageReaction,
-                include: [Message, Reaction]
-            }],
-        })
-        res.status(200).json(user)
+        const data = req.superAccess === true ? await User.findAll() : await User.scope('hideSensitive').findAll()
+        return res.status(200).json(data)
     } catch (e) {
-        next(new httpException(500, e))
+        return next(new HttpException(500, e))
     }
 }
 
-const getAll = async (_req, res, next) => {
+const getOne = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     try {
-        const users = await User.scope('hideSensitive').findAll({ include: [Message, {
-            model: RolePermission,
-            include: [Role, Permission]
-        }, {
-            model: MessageReaction,
-            include: [Message, Reaction]
-        }] })
-        res.status(200).json(users)
-    } catch (e) {
-        next(new httpException(500, e))
+        const data = req.superAccess === true ? await User.findOne({ where: { Uuid: req.params.id } }) :
+            req.params.id === req.decodedJWTPayload.uuid ? await User.scope('hideSensitive').findOne({ where: { Uuid: req.params.id } }) : undefined
+        if (!data) throw new HttpException(500, 'Encountered an error while retrieving data')
+        return res.status(200).json(data)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 const createOne = async (req, res, next) => {
-    if (!req.body) return next(new httpException(400, 'Missing Request Body'))
+    if (!req.body) return next(new HttpException(400, 'Request body not found'))
+    const { Username, Password, Email, AvatarUrl } = req.body
+    if (!Username || !Password) return next(new HttpException(400, 'Username or password not found'))
     try {
-        const user = await User.create(req.body)
-        const userRole = await Role.scope('defaultUser').findOne()
-        const userRolePerms = await user.addRolePermission(await userRole.getRolePermissions())
-        res.status(200).json(Object.assign({}, user, userRolePerms))
-    } catch (e) {
-        next(new httpException(500, e))
+        const hashedPass = await hashPass(Password)
+        const result = await User.create({
+            Uuid: crypto.randomUUID(),
+            Username,
+            PasswordHash: hashedPass,
+            Email,
+            AvatarUrl,
+            Device: 'Unknown',
+            IpAddress: null,
+            LastVisit: null,
+        })
+        return res.status(200).json(result)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 const updateOne = async (req, res, next) => {
-    if (!req.body || !req.params.id) return next(new httpException(400, 'Missing Request Body or ID'))
+    if (!req.body) return next(new HttpException(400, 'Request body not found'))
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { Username, Password, Email, AvatarUrl } = req.body
+    const { id } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     try {
-        const user = await User.update(req.body, {
+        const hashedPass = await hashPass(Password)
+        const result = await User.update({
+            Username,
+            PasswordHash: hashedPass,
+            Email,
+            AvatarUrl,
+        }, {
             where: {
-                [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
-            },
+                Uuid: id,
+            }
         })
-        res.status(200).json(user)
-    } catch (e) {
-        next(new httpException(500, e))
+        return res.status(200).json(result)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 const deleteOne = async (req, res, next) => {
-    if (!req.params.id) return next(new httpException(400, 'Missing ID Parameter'))
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
     try {
-        const user = await User.destroy({
+        const result = await User.destroy({
             where: {
-                [isUuid(req.params.id) ? 'Uuid' : 'Username']: req.params.id,
-            },
-        })
-        res.status(200).json(user)
-    } catch (e) {
-        next(new httpException(500, e))
-    }
-}
-
-const alterRolePermission = async (req, res, next) => {
-    if (!req.params.id || !req.params.roleId) return next(new httpException(400, 'Missing ID Parameter'))
-    if (!req.body.Action || (req.body.Action !== 'Grant' && req.body.Action !== 'Revoke')) return next(new httpException(400, 'Invalid action (Grant or Revoke needed)'))
-    try {
-        const role = await Role.findOne({
-            where: {
-                [isUuid(req.params.roleId) ? 'Uuid' : 'Name']: req.params.roleId,
-            },
-        })
-        if (!role) return next(new httpException(404, 'Requested role does not exist'))
-        const user = await User.scope('hideSensitive').findOne({
-            where: {
-                [isUuid(req.params.id) ? 'Uuid': 'Username']: req.params.id,
-            },
-        })
-        if (!user) return next(new httpException(404, 'Requested user does not exist'))
-        const rolePermissions = await role.getRolePermissions()
-        if (req.body.Action === 'Grant') {
-            await user.addRolePermissions(rolePermissions)
-        } else {
-            await user.removeRolePermissions(rolePermissions)
-        }
-        res.status(200).json(await user.getRolePermissions())
-    } catch (e) {
-        next(new httpException(500, e))
-    }
-}
-
-const alterMessageReaction = async (req, res, next) => {
-    if (!req.params.id || !req.params.messageId || !req.params.reactionId) return next(new httpException(400, 'Missing ID Parameter'))
-    try {
-        const user = await User.scope('hideSensitive').findOne({
-            where: {
-                [isUuid(req.params.id) ? 'Uuid': 'Username']: req.params.id,
-            },
-        })
-        if (!user) return next(new httpException(404, 'Requested user does not exist'))
-        const message = await Message.findOne({
-            where: {
-                [isUuid(req.params.messageId) ? 'Uuid': 'Name']: req.params.messageId,
-            },
-        })
-        if (!message) return next(new httpException(404, 'Requested message does not exist'))
-        const reaction = await Reaction.findOne({
-            where: {
-                [isUuid(req.params.reactionId) ? 'Uuid': 'Name']: req.params.reactionId,
-            },
-        })
-        if (!reaction) return next(new httpException(404, 'Requested reaction does not exist'))
-        const messageReaction = await MessageReaction.findOne({
-            where: {
-                ReactionUuid: reaction.Uuid,
-                MessageUuid: message.Uuid,
-            },
-        })
-        if (!messageReaction) return next(new httpException(404, 'Requested message reaction doesn\'t exist'))
-        const allMessageReactions = await message.getMessageReactions()
-        if (await user.hasMessageReaction(messageReaction)) {
-            await user.removeMessageReaction(messageReaction)
-        } else {
-            for (const singleMessageReaction of allMessageReactions) {
-                if (await user.hasMessageReaction(singleMessageReaction)) {
-                    return next(new httpException(400, 'User already reacted to this message'))
-                }
+                Uuid: id,
             }
-            await user.addMessageReaction(messageReaction)
-        }
-        res.status(200).json(await user.getMessageReactions())
-    } catch (e) {
-        next(new httpException(500, e))
-    }
-}
-
-const alterMessageTag = async (req, res, next) => {
-    if (!req.params.id || !req.params.messageId || !req.params.tagId) return next(new httpException(400, 'Missing ID Parameter'))
-    try {
-        const user = await User.scope('hideSensitive').findOne({
-            where: {
-                [isUuid(req.params.id) ? 'Uuid': 'Username']: req.params.id,
-            },
         })
-        if (!user) return next(new httpException(404, 'Requested user does not exist'))
-        const message = await Message.findOne({
-            where: {
-                [isUuid(req.params.messageId) ? 'Uuid': 'Name']: req.params.messageId,
-            },
-        })
-        if (!message) return next(new httpException(404, 'Requested message does not exist'))
-        const tag = await Tag.findOne({
-            where: {
-                [isUuid(req.params.tagId) ? 'Uuid': 'Name']: req.params.tagId,
-            },
-        })
-        if (!tag) return next(new httpException(404, 'Requested tag does not exist'))
-        const messageTag = await MessageTag.findOne({
-            where: {
-                TagUuid: tag.Uuid,
-                MessageUuid: message.Uuid,
-            },
-        })
-        if (!messageTag) return next(new httpException(404, 'Requested message tag doesn\'t exist'))
-        if (await user.hasMessageTag(messageTag)) {
-            await user.removeMessageTag(messageTag)
-        } else {
-            await user.addMessageTag(messageTag)
-        }
-        res.status(200).json(await user.getMessageTags())
-    } catch (e) {
-        next(new httpException(500, e))
+        return res.status(200).json(result)
+    } catch(e) {
+        return next(new HttpException(500, e))
     }
 }
 
 export {
-    getOne,
     getAll,
+    getOne,
     createOne,
     updateOne,
     deleteOne,
-    alterRolePermission,
-    alterMessageReaction,
-    alterMessageTag,
+}
+
+// User Post
+
+const getPosts = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
+    try {
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const posts = await user.getPosts()
+        return res.status(200).json(posts)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const createPost = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    if (!req.body) return next(new HttpException(400, 'Request body not found'))
+    const { id } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    const { Title, Text } = req.body
+    if (!Title || !Text) return next(new HttpException(400, 'Missing post title or text'))
+    try {
+        const t = await sequelize.transaction()
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }, transaction: t
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const message = await Message.create({
+            Uuid: crypto.randomUUID(),
+            Title,
+            Text
+        }, { transaction: t })
+        const post = await Post.create({
+            Uuid: crypto.randomUUID(),
+            AuthorUuid: user.Uuid,
+            LastEditorUuid: null,
+            MessageUuid: message.Uuid,
+            Locked: false,
+            Pinned: false,
+        }, { transaction: t })
+        await t.commit()
+        return res.status(200).json(post)
+    } catch(e) {
+        await t.rollback()
+        return next(new HttpException(500, e))
+    }
+}
+
+const updatePost = async (req, res, next) => {
+    if (!req.params.id || !req.params.postId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    if (!req.body) return next(new HttpException(400, 'Request body not found'))
+    const { id, postId } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    const { Title, Text } = req.body
+    try {
+        const t = await sequelize.transaction()
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }, transaction: t
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const post = await Post.findOne({
+            where: {
+                Uuid: postId,
+            }, transaction: t
+        })
+        if(!post) return next(new HttpException(404, 'Post not found'))
+        const message = await post.getMessage({ transaction: t })
+        const result = await message.update({
+            Title,
+            Text,
+        }, { transaction: t })
+        await post.setPostLastEditor(user, { transaction: t })
+        await t.commit()
+        return res.status(200).json(result)
+    } catch(e) {
+        await t.rollback()
+        return next(new HttpException(500, e))
+    }
+}
+
+const deletePost = async (req, res, next) => {
+    if (!req.params.id || !req.params.postId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, postId } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    try {
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const post = await Post.findOne({
+            where: {
+                Uuid: postId,
+            }
+        })
+        if(!post) return next(new HttpException(404, 'Post not found'))
+        const result = await post.destroy()
+        return res.status(200).json(result)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+export {
+    getPosts,
+    createPost,
+    updatePost,
+    deletePost,
+}
+
+// User Reply
+
+const getReplies = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
+    try {
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const replies = await user.getReplies()
+        return res.status(200).json(replies)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const createReply = async (req, res, next) => {
+    if (!req.params.id || !req.params.postId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    if (!req.body) return next(new HttpException(400, 'Request body not found'))
+    const { id, postId } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    const { Title, Text } = req.body
+    if (!Title || !Text) return next(new HttpException(400, 'Missing reply title or text'))
+    try {
+        const t = await sequelize.transaction()
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }, transaction: t
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const post = await Post.findOne({
+            where: {
+                Uuid: postId,
+            }, transaction: t
+        })
+        if (!post) return next(new HttpException(404, 'Post not found'))
+        if (post.Locked === true) return next(new HttpException(403, 'Post is locked'))
+        const message = await Message.create({
+            Uuid: crypto.randomUUID(),
+            Title,
+            Text
+        }, { transaction: t })
+        const reply = await Reply.create({
+            Uuid: crypto.randomUUID(),
+            AuthorUuid: user.Uuid,
+            LastEditorUuid: null,
+            MessageUuid: message.Uuid,
+            PostUuid: post.Uuid,
+        }, { transaction: t })
+        await t.commit()
+        return res.status(200).json(reply)
+    } catch(e) {
+        await t.rollback()
+        return next(new HttpException(500, e))
+    }
+}
+
+const updateReply = async (req, res, next) => {
+    if (!req.params.id || !req.params.replyId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    if (!req.body) return next(new HttpException(400, 'Request body not found'))
+    const { id, replyId } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    const { Title, Text } = req.body
+    try {
+        const t = await sequelize.transaction()
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }, transaction: t
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const reply = await Reply.findOne({
+            where: {
+                Uuid: replyId,
+            }, transaction: t
+        })
+        if(!reply) return next(new HttpException(404, 'Reply not found'))
+        const message = await reply.getMessage({ transaction: t })
+        const result = await message.update({
+            Title,
+            Text,
+        }, { transaction: t })
+        await reply.setPostLastEditor(user, { transaction: t })
+        await t.commit()
+        return res.status(200).json(result)
+    } catch(e) {
+        await t.rollback()
+        return next(new HttpException(500, e))
+    }
+}
+
+const deleteReply = async (req, res, next) => {
+    if (!req.params.id || !req.params.replyId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, replyId } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    try {
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const reply = await Reply.findOne({
+            where: {
+                Uuid: replyId,
+            }
+        })
+        if(!reply) return next(new HttpException(404, 'Reply not found'))
+        const result = await reply.destroy()
+        return res.status(200).json(result)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+export {
+    getReplies,
+    createReply,
+    updateReply,
+    deleteReply,
+}
+
+// User Grant
+
+const getRoles = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
+    //if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    try {
+        const user = await User.findAll({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const roles = await user.getRoles()
+        return res.status(200).json(roles)
+    } catch (e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const createRole = async (req, res, next) => {
+    if (!req.params.id || !req.params.roleId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, roleId } = req.params
+    try {
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        if (await user.hasRole(roleId)) return next(new HttpException(400, 'User role exists'))
+        const result = await user.addRole(roleId)
+        return res.status(200).json(result)
+    } catch (e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const deleteRole = async (req, res, next) => {
+    if (!req.params.id || !req.params.roleId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, roleId } = req.params
+    try {
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        if (!await user.hasRole(roleId)) return next(new HttpException(400, 'User role does not exist already'))
+        const result = await user.removeRole(roleId)
+        return res.status(200).json(result)
+    } catch (e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+export {
+    getRoles,
+    createRole,
+    deleteRole,
+}
+
+// User Engagement
+
+const getReactions = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
+    try {
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const engagement = await Engagement.findAll({
+            where: {
+                UserUuid: id,
+            }
+        })
+        return res.status(200).json(engagement)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const createReaction = async (req, res, next) => {
+    if (!req.params.id || !req.params.reactionId || !req.params.messageId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, reactionId, messageId } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    try {
+        const hasMessageReaction = await Engagement.findOne({
+            where: {
+                UserUuid: id,
+                MessageUuid: messageId,
+            }
+        })
+        if (hasMessageReaction) return next(new HttpException(400, 'User message reaction already exists'))
+        const result = await Engagement.create({
+            UserUuid: id,
+            ReactionUuid: reactionId,
+            MessageUuid: messageId,
+        })
+        return res.status(200).json(result)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const deleteReaction = async (req, res, next) => {
+    if (!req.params.id || !req.params.reactionId || !req.params.messageId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, reactionId, messageId } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    try {
+        const hasMessageReaction = await Engagement.findOne({
+            where: {
+                UserUuid: id,
+                MessageUuid: messageId,
+            }
+        })
+        if (!hasMessageReaction) return next(new HttpException(400, 'User message reaction not found'))
+        const result = await Engagement.destroy({
+            UserUuid: id,
+            ReactionUuid: reactionId,
+            MessageUuid: messageId,
+        })
+        return res.status(200).json(result)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+export {
+    getReactions,
+    createReaction,
+    deleteReaction,
+}
+
+// User Favorite
+
+const getTags = async (req, res, next) => {
+    if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    try {
+        const favorite = await Favorite.findAll({
+            where: {
+                UserUuid: id,
+            }
+        })
+        return res.status(200).json(favorite)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const createTag = async (req, res, next) => {
+    if (!req.params.id || !req.params.tagId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, tagId } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    try {
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const hasTag = await User.hasTag(tagId)
+        if (hasTag) return next(new HttpException(400, 'User tag already exists'))
+        const addTag = await User.addTag(tagId)
+        return res.status(200).json(addTag)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+const deleteTag = async (req, res, next) => {
+    if (!req.params.id || !req.params.tagId) return next(new HttpException(400, 'Missing ID in request parameter'))
+    const { id, tagId } = req.params
+    if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    try {
+        const user = await User.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const hasTag = await User.hasTag(tagId)
+        if (!hasTag) return next(new HttpException(400, 'User tag not found'))
+        const removeTag = await User.removeTag(tagId)
+        return res.status(200).json(removeTag)
+    } catch(e) {
+        return next(new HttpException(500, e))
+    }
+}
+
+export {
+    getTags,
+    createTag,
+    deleteTag,
 }
