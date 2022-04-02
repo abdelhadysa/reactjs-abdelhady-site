@@ -165,13 +165,13 @@ const updatePost = async (req, res, next) => {
                 Uuid: id,
             }, transaction: t
         })
-        if (!user) return next(new HttpException(404, 'User not found'))
+        if (!user) throw new Error('User not found')
         const post = await Post.findOne({
             where: {
                 Uuid: postId,
             }, transaction: t
         })
-        if(!post) return next(new HttpException(404, 'Post not found'))
+        if(!post) throw new Error('Post not found')
         const message = await post.getMessage({ transaction: t })
         const result = await message.update({
             Title,
@@ -196,13 +196,13 @@ const deletePost = async (req, res, next) => {
                 Uuid: id,
             }
         })
-        if (!user) return next(new HttpException(404, 'User not found'))
+        if (!user) throw new Error('User not found')
         const post = await Post.findOne({
             where: {
                 Uuid: postId,
             }
         })
-        if(!post) return next(new HttpException(404, 'Post not found'))
+        if(!post) throw new Error('Post not found')
         const result = await post.destroy()
         return res.status(200).json(result)
     } catch(e) {
@@ -250,14 +250,14 @@ const createReply = async (req, res, next) => {
                 Uuid: id,
             }, transaction: t
         })
-        if (!user) return next(new HttpException(404, 'User not found'))
+        if (!user) throw new Error('User not found')
         const post = await Post.findOne({
             where: {
                 Uuid: postId,
             }, transaction: t
         })
-        if (!post) return next(new HttpException(404, 'Post not found'))
-        if (post.Locked === true) return next(new HttpException(403, 'Post is locked'))
+        if (!post) throw new Error('Post not found')
+        if (post.Locked === true) throw new Error('Post is locked')
         const message = await Message.create({
             Uuid: crypto.randomUUID(),
             Title,
@@ -291,13 +291,13 @@ const updateReply = async (req, res, next) => {
                 Uuid: id,
             }, transaction: t
         })
-        if (!user) return next(new HttpException(404, 'User not found'))
+        if (!user) throw new Error('User not found')
         const reply = await Reply.findOne({
             where: {
                 Uuid: replyId,
             }, transaction: t
         })
-        if(!reply) return next(new HttpException(404, 'Reply not found'))
+        if(!reply) throw new Error('Reply not found')
         const message = await reply.getMessage({ transaction: t })
         const result = await message.update({
             Title,
