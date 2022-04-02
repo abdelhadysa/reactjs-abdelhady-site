@@ -177,7 +177,7 @@ const updatePost = async (req, res, next) => {
             Title,
             Text,
         }, { transaction: t })
-        await post.setPostLastEditor(user, { transaction: t })
+        await post.setPostLastEditor(user.Uuid, { transaction: t })
         await t.commit()
         return res.status(200).json(result)
     } catch(e) {
@@ -303,7 +303,7 @@ const updateReply = async (req, res, next) => {
             Title,
             Text,
         }, { transaction: t })
-        await reply.setReplyLastEditor(user, { transaction: t })
+        await reply.setReplyLastEditor(user.Uuid, { transaction: t })
         await t.commit()
         return res.status(200).json(result)
     } catch(e) {
