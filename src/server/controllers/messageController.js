@@ -126,9 +126,13 @@ const updatePost = async (req, res, next) => {
             }
         })
         if (!post) return next(new HttpException(404, 'No post found for this message'))
-        const result = post.update({
+        const result = Post.update({
             Locked,
             Pinned,
+        }, {
+            where: {
+                MessageUuid: id,
+            }
         })
         return res.status(200).json(result)
     } catch (e) {
@@ -196,8 +200,12 @@ const updateReply = async (req, res, next) => {
             }
         })
         if (!reply) return next(new HttpException(404, 'No replies found for this message'))
-        const result = await reply.update({
+        const result = await Reply.update({
             PostUuid,
+        }, {
+            where: {
+                MessageUuid: id,
+            }
         })
         return res.status(200).json(result)
     } catch (e) {

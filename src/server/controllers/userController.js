@@ -172,11 +172,14 @@ const updatePost = async (req, res, next) => {
             }, transaction: t
         })
         if(!post) throw new Error('Post not found')
-        const message = await post.getMessage({ transaction: t })
-        const result = await message.update({
+        const result = await Message.update({
             Title,
             Text,
-        }, { transaction: t })
+        }, { 
+            where: {
+                Uuid: post.MessageUuid,
+            }, transaction: t
+         })
         await post.setPostLastEditor(user.Uuid, { transaction: t })
         await t.commit()
         return res.status(200).json(result)
@@ -298,11 +301,14 @@ const updateReply = async (req, res, next) => {
             }, transaction: t
         })
         if(!reply) throw new Error('Reply not found')
-        const message = await reply.getMessage({ transaction: t })
-        const result = await message.update({
+        const result = await Message.update({
             Title,
             Text,
-        }, { transaction: t })
+        }, { 
+            where: {
+                Uuid: reply.MessageUuid,
+            }, transaction: t
+        })
         await reply.setReplyLastEditor(user.Uuid, { transaction: t })
         await t.commit()
         return res.status(200).json(result)
