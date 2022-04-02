@@ -1,7 +1,5 @@
 'use strict';
-const {
-	Model
-} = require('sequelize');
+import { Model } from 'sequelize'
 const List = (sequelize, DataTypes) => {
 	class List extends Model {
 		/**
