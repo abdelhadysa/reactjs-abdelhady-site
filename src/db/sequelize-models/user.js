@@ -9,12 +9,12 @@ const User = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// Post
-			User.hasMany(models.Post, { as: 'PostAuthor', foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
-			User.hasMany(models.Post, { as: 'PostLastEditor', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
+			User.hasMany(models.Post, { foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
+			User.hasMany(models.Post, { foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
 
 			// Reply
-			User.hasMany(models.Reply, { as: 'ReplyAuthor', foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
-			User.hasMany(models.Reply, { as: 'ReplyLastEditor', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
+			User.hasMany(models.Reply, { foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
+			User.hasMany(models.Reply, { foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
 
 			// Grant
 			User.hasMany(models.Grant, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })

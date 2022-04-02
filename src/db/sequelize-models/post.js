@@ -11,8 +11,8 @@ const Post = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// User
-			Post.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
-			Post.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
+			Post.belongsTo(models.User.scope('hideSensitive'), {as: 'PostAuthor', foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
+			Post.belongsTo(models.User.scope('hideSensitive'), {as: 'PostLastEditor', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
 
 			// Message
 			Post.belongsTo(models.Message, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
