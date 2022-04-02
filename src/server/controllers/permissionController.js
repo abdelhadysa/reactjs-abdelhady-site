@@ -1,12 +1,15 @@
 import models, { sequelize } from 'Database/sequelize-models'
 import HttpException from '../utils/HttpException'
-const { Permission } = models
+const { Permission, Role, Right } = models
 
 // Permission
 
 const getAll = async (req, res, next) => {
     try {
-        const permissions = await Permission.findAll()
+        const permissions = await Permission.findAll({ include: [{
+            model: Right,
+            include: Role
+        }] })
         return res.status(200).json(permissions)
     } catch(e) {
         return next(new HttpException(500, e))
