@@ -130,3 +130,10 @@ export const D_DEFAULT_PERM = {
     GET_REACTIONS: D_REACTION_PERM.GET_ALL,
     GET_REACTION: D_REACTION_PERM.GET,
 }
+
+export const D_DEFAULT_REACTIONS = [
+    { Name: 'Like', Points: 1 },
+    { Name: 'Love', Points: 2 },
+    { Name: 'Confused', Points: 1 },
+    { Name: 'Sad', Points: 1 },
+]

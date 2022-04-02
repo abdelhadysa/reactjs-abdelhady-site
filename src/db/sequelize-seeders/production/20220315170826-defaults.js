@@ -13,6 +13,7 @@ const {
 	D_REACTION_PERM,
 	D_LOG_PERM, 
 	D_DEFAULT_PERM,
+	D_DEFAULT_REACTIONS,
 } = require('../../../server/utils/defaults')
 const crypto = require('crypto')
 module.exports = {
@@ -105,6 +106,15 @@ module.exports = {
 				}
 			})]
 		)
+		await queryInterface.bulkInsert('Reactions', D_DEFAULT_REACTIONS.map((defaultReaction) => {
+			return {
+				Uuid: crypto.randomUUID(),
+				Name: defaultReaction.Name,
+				Points: defaultReaction.Points,
+				CreatedAt: new Date(),
+				UpdatedAt: new Date(),	
+			}
+		}))
 	},
 
 	async down (queryInterface, Sequelize) {
@@ -113,5 +123,6 @@ module.exports = {
 		await queryInterface.bulkDelete('Permissions', null, {});
 		await queryInterface.bulkDelete('Grants', null, {});
 		await queryInterface.bulkDelete('Rights', null, {});
+		await queryInterface.bulkDelete('Reactions', null, {});
 	}
 };
