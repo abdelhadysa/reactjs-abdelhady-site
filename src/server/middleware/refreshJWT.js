@@ -38,6 +38,7 @@ const refreshJWT = async (req, res, next) => {
         res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true }) // Renew cookie
         return next()
     } catch (e) { 
+        res.clearCookie('token')
         return next(new HttpException((e instanceof jwt.JsonWebTokenError) ? 401 : 400, e))
     }
 }
