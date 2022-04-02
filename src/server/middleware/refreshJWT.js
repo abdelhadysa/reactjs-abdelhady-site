@@ -32,10 +32,6 @@ const refreshJWT = async (req, res, next) => {
         const decoded = await verifyJWT(token) // Verify and decode the JWT token
         const unixTimestamp = Math.floor(Date.now() / 1000)
         // console.log(decoded.exp, unixTimestamp)
-        // If the decoded expiry timestamp is still not reached
-        // and the difference is greater than a minute
-        // or the current timestamp exceeds the decoded timestamp
-        // don't renew the token
         if (decoded.exp - unixTimestamp > process.env.JWT_REFRESHIN) return next()
         const { uuid } = decoded
         const newToken = await signJWT({ uuid }) // Renew token
