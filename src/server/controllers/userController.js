@@ -123,8 +123,8 @@ const createPost = async (req, res, next) => {
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     const { Title, Text } = req.body
     if (!Title || !Text) return next(new HttpException(400, 'Missing post title or text'))
+    const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const user = await User.findOne({
             where: {
                 Uuid: id,
@@ -158,8 +158,8 @@ const updatePost = async (req, res, next) => {
     const { id, postId } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     const { Title, Text } = req.body
+    const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const user = await User.findOne({
             where: {
                 Uuid: id,
@@ -243,8 +243,8 @@ const createReply = async (req, res, next) => {
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     const { Title, Text } = req.body
     if (!Title || !Text) return next(new HttpException(400, 'Missing reply title or text'))
+    const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const user = await User.findOne({
             where: {
                 Uuid: id,
@@ -284,8 +284,8 @@ const updateReply = async (req, res, next) => {
     const { id, replyId } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     const { Title, Text } = req.body
+    const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const user = await User.findOne({
             where: {
                 Uuid: id,
