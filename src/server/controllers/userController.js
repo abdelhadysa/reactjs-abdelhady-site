@@ -21,7 +21,7 @@ const getOne = async (req, res, next) => {
     try {
         const data = req.superAccess === true ? await User.findOne({ where: { Uuid: req.params.id } }) :
             req.params.id === req.decodedJWTPayload.uuid ? await User.scope('hideSensitive').findOne({ where: { Uuid: req.params.id } }) : undefined
-        if (!data) throw new HttpException(500, 'Encountered an error while retrieving data')
+        if (!data) throw new Error('Encountered an error while retrieving data')
         return res.status(200).json(data)
     } catch(e) {
         return next(new HttpException(500, e))
