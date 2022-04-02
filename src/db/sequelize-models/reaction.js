@@ -1,7 +1,5 @@
 'use strict';
-const {
-	Model
-} = require('sequelize');
+import { Model } from 'sequelize'
 const Reaction = (sequelize, DataTypes) => {
 	class Reaction extends Model {
 		/**
