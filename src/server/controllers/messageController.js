@@ -16,7 +16,7 @@ const getAll = async (req, res, next) => {
 
 const getOne = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
-    const { id } = req.params.id
+    const { id } = req.params
     try {
         const message = await Message.findOne({
             where: {
@@ -46,7 +46,7 @@ const createOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
-    const { id } = req.params.id
+    const { id } = req.params
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
     const { Title, Text } = req.body
     if (!Title || !Text) return next(new HttpException(400, 'Missing title or text of the message'))
@@ -67,7 +67,7 @@ const updateOne = async (req, res, next) => {
 
 const deleteOne = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
-    const { id } = req.params.id
+    const { id } = req.params
     try {
         const message = await Message.destroy({
             where: {
