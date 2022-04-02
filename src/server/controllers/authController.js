@@ -23,7 +23,7 @@ const { User, Role, Grant } = models
 
 const register = async (req, res, next) => {
     try {
-        const { Username, Password } = req.body
+        const { Username, Password, Email } = req.body
         if (!Username || Username.length < 3 || Username.length > 15) return next(new HttpException(400, 'Username should be from 3 to 15 characters'))
         if (!Password || Password.length < 8 || Password.length > 65) return next(new HttpException(400, 'Password should be from 8 to 65 characters'))
         const hashedPass = await hashPass(Password)
@@ -31,6 +31,7 @@ const register = async (req, res, next) => {
         const user = await User.create({
             Username: Username,
             PasswordHash: hashedPass,
+            Email,
         }, { transaction: t })
         const userRole = await Role.scope('defaultUser').findOne({ transaction: t })
         await Grant.create({
