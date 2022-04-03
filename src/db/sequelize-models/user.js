@@ -27,6 +27,9 @@ const User = (sequelize, DataTypes) => {
 
 			// Role
 			User.belongsToMany(models.Role, { through: models.Grant })
+
+			// User
+			User.hasMany(models.View, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
 		}
 	}
 	User.init({

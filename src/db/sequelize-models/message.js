@@ -19,6 +19,9 @@ const Message = (sequelize, DataTypes) => {
 
 			// List
 			Message.hasMany(models.List, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+
+			// View
+			Message.hasMany(models.View, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
 		}
 	}
 	Message.init({
