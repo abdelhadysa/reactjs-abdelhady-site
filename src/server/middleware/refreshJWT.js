@@ -13,8 +13,10 @@ import verifyJWT from '../utils/verifyJWT'
 import signJWT from '../utils/signJWT'
 import HttpException from '../utils/HttpException'
 import jwt from 'jsonwebtoken'
+import models, { sequelize } from 'Database/sequelize-models'
 
 dotenv.config()
+const { User } = models
 
 /*
  * Logic:
@@ -32,6 +34,18 @@ const refreshJWT = async (req, res, next) => {
         const decoded = await verifyJWT(token) // Verify and decode the JWT token
         const unixTimestamp = Math.floor(Date.now() / 1000)
         // console.log(decoded.exp, unixTimestamp)
+
+        // Update User Meta Data
+        User.update({
+            IpAddress: req.ip,
+            Device: req.device.type.charAt(0).toUpperCase() + req.device.type.slice(1)
+        }, {
+            where: {
+                Uuid: decoded.uuid,
+            }
+        })
+
+        // Renewal Code
         if (decoded.exp - unixTimestamp > process.env.JWT_REFRESHIN) return next()
         const { uuid } = decoded
         const newToken = await signJWT({ uuid }) // Renew token
