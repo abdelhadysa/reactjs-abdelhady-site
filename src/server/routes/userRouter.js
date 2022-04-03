@@ -11,13 +11,33 @@ const express = require('express')
 import * as userController from '../controllers/userController'
 import requirePerm from '../middleware/requirePerm'
 import { D_USER_PERM } from '../utils/defaults'
+import multer from 'multer'
+
+const storage = multer.diskStorage({
+    destination: path.resolve('dist/', 'uploads'),
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.')[1])
+    }
+})
+  
+const upload = multer({ storage: storage, fileFilter: function fileFilter (req, file, cb) {
+    if (file.size > 1000000) return cb(null, false)
+    const ext = file.originalname.split('.')[1]
+    switch (ext) {
+        case 'jpg':
+        case 'jpeg':
+        case 'png': return cb(null, true)
+        default: return cb(null, false)
+    }
+} })
 
 const userRouter = express.Router()
 
 userRouter.get('/', [requirePerm(D_USER_PERM.GET_ALL), userController.getAll])
 userRouter.get('/:id', [requirePerm(D_USER_PERM.GET), userController.getOne])
 userRouter.post('/', [requirePerm(D_USER_PERM.CREATE), userController.createOne])
-userRouter.put('/:id', [requirePerm(D_USER_PERM.UPDATE), userController.updateOne])
+userRouter.put('/:id', [requirePerm(D_USER_PERM.UPDATE), upload.single('avatar'), userController.updateOne])
 userRouter.delete('/:id', [requirePerm(D_USER_PERM.DELETE), userController.deleteOne])
 
 userRouter.get('/:id/post', [requirePerm(D_USER_PERM.GET_POSTS), userController.getPosts])

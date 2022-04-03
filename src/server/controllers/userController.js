@@ -111,9 +111,10 @@ const createOne = async (req, res, next) => {
 const updateOne = async (req, res, next) => {
     if (!req.body) return next(new HttpException(400, 'Request body not found'))
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
-    const { Username, Password, Email, AvatarUrl } = req.body
+    const { Username, Password, Email } = req.body
     const { id } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    const AvatarUrl = req.file !== undefined ? req.file.filename : undefined
     try {
         const hashedPass = await hashPass(Password)
         const result = await User.update({
