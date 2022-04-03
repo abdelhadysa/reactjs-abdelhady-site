@@ -1,7 +1,7 @@
 import models, { sequelize } from 'Database/sequelize-models'
 import HttpException from '../utils/HttpException'
 
-const { Message, Post, Reply, Engagement, Reaction, List, Tag, User } = models
+const { Message, Post, Reply, Engagement, Reaction, List, Tag, User, View } = models
 
 // Message
 
@@ -25,8 +25,25 @@ const getOne = async (req, res, next) => {
             include: [Post, Reply, {
                 model: Engagement,
                 include: [User, Reaction]
-            }, List]
+            }, List, {
+                model: View,
+                include: User
+            }]
         })
+        if (!message) return next(new HttpException(404, 'Message not found'))
+        // Add view
+        const hasViewed = await View.findOne({
+            where: {
+                UserUuid: req.decodedJWTPayload.uuid,
+                MessageUuid: id,
+            }
+        })
+        if (!hasViewed) {
+            await View.create({
+                UserUuid: req.decodedJWTPayload.uuid,
+                MessageUuid: id,
+            })
+        }
         return res.status(200).json(message)
     } catch (e) {
         return next(new HttpException(500, e))
@@ -107,7 +124,7 @@ const getPost = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
     try {
-        const post = Post.findOne({
+        const post = await Post.findOne({
             where: {
                 MessageUuid: id,
             },
@@ -116,9 +133,26 @@ const getPost = async (req, res, next) => {
                 include: [{
                     model: Engagement,
                     include: [User, Reaction]
-                }, List]
+                }, List, {
+                    model: View,
+                    include: User
+                }]
             }
         })
+        if (!post) return next(new HttpException(404, 'Message not found'))
+        // Add view
+        const hasViewed = await View.findOne({
+            where: {
+                UserUuid: req.decodedJWTPayload.uuid,
+                MessageUuid: id,
+            }
+        })
+        if (!hasViewed) {
+            await View.create({
+                UserUuid: req.decodedJWTPayload.uuid,
+                MessageUuid: id,
+            })
+        }
         return res.status(200).json(post)
     } catch (e) {
         return next(new HttpException(500, e))
@@ -131,13 +165,13 @@ const updatePost = async (req, res, next) => {
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
     const { Locked, Pinned } = req.body
     try {
-        const post = Post.findOne({
+        const post = await Post.findOne({
             where: {
                 MessageUuid: id,
             }
         })
         if (!post) return next(new HttpException(404, 'No post found for this message'))
-        const result = Post.update({
+        const result = await Post.update({
             Locked,
             Pinned,
         }, {
@@ -155,7 +189,7 @@ const deletePost = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
     try {
-        const post = Post.destroy({
+        const post = await Post.destroy({
             where: {
                 MessageUuid: id,
             }
@@ -193,6 +227,20 @@ const getReply = async (req, res, next) => {
                 MessageUuid: id,
             }
         })
+        if (!reply) return next(new HttpException(404, 'Message not found'))
+        // Add view
+        const hasViewed = await View.findOne({
+            where: {
+                UserUuid: req.decodedJWTPayload.uuid,
+                MessageUuid: id,
+            }
+        })
+        if (!hasViewed) {
+            await View.create({
+                UserUuid: req.decodedJWTPayload.uuid,
+                MessageUuid: id,
+            })
+        }
         return res.status(200).json(reply)
     } catch (e) {
         return next(new HttpException(500, e))
