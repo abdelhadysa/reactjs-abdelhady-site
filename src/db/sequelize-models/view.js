@@ -1,8 +1,6 @@
 'use strict';
-const {
-	Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+import { Model } from 'sequelize'
+const View = (sequelize, DataTypes) => {
 	class View extends Model {
 		/**
 		 * Helper method for defining associations.
@@ -40,3 +38,4 @@ module.exports = (sequelize, DataTypes) => {
 	});
 	return View;
 };
+export default View
