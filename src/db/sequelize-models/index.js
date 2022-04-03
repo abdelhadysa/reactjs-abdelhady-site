@@ -21,6 +21,7 @@ import Role from './role'
 import Tag from './tag'
 import User from './user'
 import Reaction from './reaction'
+import View from './view'
 
 let sequelize;
 if (config.use_env_variable) {
@@ -44,6 +45,7 @@ const models = {
 	Grant: Grant(sequelize, Sequelize.DataTypes),
 	List: List(sequelize, Sequelize.DataTypes),
 	Right: Right(sequelize, Sequelize.DataTypes),
+	View: View(sequelize, Sequelize.DataTypes),
 };
 
 //require.context(__dirname, false, /^((?!index).)*\.js$/)
