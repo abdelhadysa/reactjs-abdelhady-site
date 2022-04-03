@@ -70,7 +70,7 @@ const User = (sequelize, DataTypes) => {
 			allowNull: true,
 			validate: {
 				isIP: true,
-				len: [6, 39],
+				len: [3, 39],
 			},
 		},
 		Device: {
