@@ -5,7 +5,7 @@ import { hashPass } from '../utils/bcryptManager'
 
 // User
 
-const { User, Message, Post, Reply, Engagement, Favorite } = models
+const { User, Message, Post, Reply, Engagement, Reaction, Favorite, Grant, Role, Right, Permission } = models
 
 const getAll = async (req, res, next) => {
     try {
@@ -19,8 +19,66 @@ const getAll = async (req, res, next) => {
 const getOne = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     try {
-        const data = req.superAccess === true ? await User.findOne({ where: { Uuid: req.params.id } }) :
-            req.params.id === req.decodedJWTPayload.uuid ? await User.scope('hideSensitive').findOne({ where: { Uuid: req.params.id } }) : undefined
+        const data = req.superAccess === true ? await User.findOne({ where: { Uuid: req.params.id },
+            include: [Engagement, {
+                model: Post,
+                include: {
+                    model: Message,
+                    include: {
+                        model: Engagement,
+                        include: [User, Reaction],
+                    }, 
+                },
+            }, {
+                model: Reply,
+                include: {
+                    model: Message,
+                    include: {
+                        model: Engagement,
+                        include: [User, Reaction],
+                    }, 
+                },
+            }, {
+                model: Grant,
+                include: {
+                    model: Role,
+                    include: {
+                        model: Right,
+                        include: [ Permission ],
+                    }
+                },
+            }]
+        }) :
+            req.params.id === req.decodedJWTPayload.uuid ? await User.scope('hideSensitive').findOne({ where: { Uuid: req.params.id },
+                include: [Engagement, {
+                    model: Post,
+                    include: {
+                        model: Message,
+                        include: {
+                            model: Engagement,
+                            include: [User, Reaction],
+                        }, 
+                    },
+                }, {
+                    model: Reply,
+                    include: {
+                        model: Message,
+                        include: {
+                            model: Engagement,
+                            include: [User, Reaction],
+                        }, 
+                    },
+                }, {
+                    model: Grant,
+                    include: {
+                        model: Role,
+                        include: {
+                            model: Right,
+                            include: [ Permission ],
+                        }
+                    },
+                }]
+            }) : undefined
         if (!data) throw new Error('Encountered an error while retrieving data')
         return res.status(200).json(data)
     } catch(e) {

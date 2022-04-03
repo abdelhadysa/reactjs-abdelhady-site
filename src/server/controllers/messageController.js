@@ -1,7 +1,7 @@
 import models, { sequelize } from 'Database/sequelize-models'
 import HttpException from '../utils/HttpException'
 
-const { Message, Post, Reply, Engagement, Reaction, List, Tag } = models
+const { Message, Post, Reply, Engagement, Reaction, List, Tag, User } = models
 
 // Message
 
@@ -21,7 +21,11 @@ const getOne = async (req, res, next) => {
         const message = await Message.findOne({
             where: {
                 Uuid: id,
-            }
+            },
+            include: [Post, Reply, {
+                model: Engagement,
+                include: [User, Reaction]
+            }, List]
         })
         return res.status(200).json(message)
     } catch (e) {
@@ -106,6 +110,13 @@ const getPost = async (req, res, next) => {
         const post = Post.findOne({
             where: {
                 MessageUuid: id,
+            },
+            include: {
+                model: Message,
+                include: [{
+                    model: Engagement,
+                    include: [User, Reaction]
+                }, List]
             }
         })
         return res.status(200).json(post)
