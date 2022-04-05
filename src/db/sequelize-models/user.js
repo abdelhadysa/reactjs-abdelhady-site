@@ -10,17 +10,17 @@ const User = (sequelize, DataTypes) => {
 		static associate(models) {
 			// Post
 			User.hasMany(models.Post, { foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
-			User.hasMany(models.Post, { foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
+			User.hasMany(models.Post, { as: 'EditedPost', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid' } })
 
 			// Reply
 			User.hasMany(models.Reply, { foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
-			User.hasMany(models.Reply, { foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
+			User.hasMany(models.Reply, { as: 'EditedReply', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid' } })
 
 			// Grant
 			User.hasMany(models.Grant, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
 
 			// Engagement
-			User.hasMany(models.Engagement, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+			User.hasMany(models.Engagement, { foreignKey: { onDelete: 'SET NULL', name: 'UserUuid' } })
 
 			// Favorite
 			User.hasMany(models.Favorite, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
@@ -28,8 +28,11 @@ const User = (sequelize, DataTypes) => {
 			// Role
 			User.belongsToMany(models.Role, { through: models.Grant })
 
-			// User
-			User.hasMany(models.View, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+			// View
+			User.hasMany(models.View, { foreignKey: { onDelete: 'SET NULL', name: 'UserUuid' } })
+
+			// Attachment
+			User.hasMany(models.Attachment, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
 		}
 	}
 	User.init({
