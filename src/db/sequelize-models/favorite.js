@@ -22,14 +22,8 @@ const Favorite = (sequelize, DataTypes) => {
 			primaryKey: true,
 			allowNull: false,
 		},
-		UserUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		},
-		TagUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		}
+		UserUuid: DataTypes.UUID,
+		TagUuid: DataTypes.UUID
 	}, {
 		sequelize,
 		modelName: 'Favorite',
