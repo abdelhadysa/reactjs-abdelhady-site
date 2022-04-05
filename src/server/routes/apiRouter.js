@@ -15,6 +15,7 @@ import roleRouter from './roleRouter'
 import permissionRouter from './permssionRouter'
 import logRouter from './logRouter'
 import tagRouter from './tagRouter'
+import attachmentRouter from './attachmentRouter'
 import authRouter from './authRouter'
 import reactionRouter from './reactionRouter'
 import refreshJWT from '../middleware/refreshJWT'
@@ -31,6 +32,7 @@ apiRouter.use('/auth', authRouter)
 apiRouter.use('/reaction', [requireJWT, reactionRouter])
 apiRouter.use('/log', [requireJWT, logRouter])
 apiRouter.use('/tag', [requireJWT, tagRouter])
+apiRouter.use('/attachment', [requireJWT, attachmentRouter])
 apiRouter.get('/', apiController)
 
 export default apiRouter
