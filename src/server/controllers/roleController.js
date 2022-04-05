@@ -33,11 +33,11 @@ const createOne = async (req, res, next) => {
     const { Name, Description, Order, Color, Super } = req.body
     try {
         const role = await Role.create({
-            Name,
-            Description,
-            Order,
-            Color,
-            Super,
+            ...Name && Name,
+            ...Description && Description,
+            ...Order && Order,
+            ...Color && Color,
+            ...Super && Super,
         })
         return res.status(200).json(role)
     } catch(e) {
@@ -52,11 +52,11 @@ const updateOne = async (req, res, next) => {
     const { Name, Description, Order, Color, Super } = req.body
     try {
         const role = await Role.update({
-            Name,
-            Description,
-            Order,
-            Color,
-            Super,
+            ...Name && Name,
+            ...Description && Description,
+            ...Order && Order,
+            ...Color && Color,
+            ...Super && Super,
         }, {
             where: {
                 Uuid: id,

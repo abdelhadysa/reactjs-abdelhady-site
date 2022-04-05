@@ -33,7 +33,7 @@ const createOne = async (req, res, next) => {
     const { Message } = req.body
     try {
         const log = await Log.create({
-            Message,
+            ...Message && Message,
         })
         return res.status(200).json(log)
     } catch (e) {
@@ -48,7 +48,7 @@ const updateOne = async (req, res, next) => {
     const { Message } = req.body
     try {
         const log = await Log.update({
-            Message,
+            ...Message && Message,
         }, {
             where: {
                 Uuid: id,

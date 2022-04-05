@@ -36,8 +36,8 @@ const createOne = async (req, res, next) => {
     const { Name, Description } = req.body
     try {
         const permission = await Permission.create({
-            Name,
-            Description,
+            ...Name && Name,
+            ...Description && Description,
         })
         return res.status(200).json(permission)
     } catch(e) {
@@ -52,8 +52,8 @@ const updateOne = async (req, res, next) => {
     const { Name, Description } = req.body
     try {
         const permission = await Permission.update({
-            Name,
-            Description,
+            ...Name && Name,
+            ...Description && Description,
         }, {
             where: {
                 Uuid: id,

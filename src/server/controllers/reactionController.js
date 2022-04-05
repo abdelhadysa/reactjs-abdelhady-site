@@ -33,8 +33,8 @@ const createOne = async (req, res, next) => {
     const { Name, Points } = req.body
     try {
         const reaction = await Reaction.create({
-            Name,
-            Points,
+            ...Name && Name,
+            ...Points && Points,
         })
         return res.status(200).json(reaction)
     } catch(e) {
@@ -49,8 +49,8 @@ const updateOne = async (req, res, next) => {
     const { Name, Points } = req.body
     try {
         const reaction = await Reaction.update({
-            Name,
-            Points,
+            ...Name && Name,
+            ...Points && Points,
         }, {
             where: {
                 Uuid: id,
