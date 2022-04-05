@@ -1,7 +1,7 @@
 import models, { sequelize } from 'Database/sequelize-models'
 import HttpException from '../utils/HttpException'
 
-const { Message, Post, Reply, Engagement, Reaction, List, Tag, User, View } = models
+const { Message, Post, Reply, Engagement, Reaction, List, Tag, User, View, Attachment } = models
 
 // Message
 
@@ -56,8 +56,8 @@ const createOne = async (req, res, next) => {
     if (!Title || !Text) return next(new HttpException(400, 'Missing title or text of the message'))
     try {
         const result = await Message.create({
-            Title,
-            Text,
+            ...Title && Title,
+            ...Text && Text,
         })
         return res.status(200).json(result)
     } catch (e) {
@@ -73,8 +73,8 @@ const updateOne = async (req, res, next) => {
     if (!Title || !Text) return next(new HttpException(400, 'Missing title or text of the message'))
     try {
         const result = await Message.update({
-            Title,
-            Text,
+            ...Title && Title,
+            ...Text && Text,
         }, {
             where: {
                 Uuid: id,
@@ -128,7 +128,7 @@ const getPost = async (req, res, next) => {
             where: {
                 MessageUuid: id,
             },
-            include: {
+            include: [{
                 model: Message,
                 include: [{
                     model: Engagement,
@@ -136,8 +136,10 @@ const getPost = async (req, res, next) => {
                 }, List, {
                     model: View,
                     include: User
-                }]
-            }
+                },
+                    Attachment
+                ]
+            }, Reply]
         })
         if (!post) return next(new HttpException(404, 'Message not found'))
         // Add view
@@ -172,8 +174,8 @@ const updatePost = async (req, res, next) => {
         })
         if (!post) return next(new HttpException(404, 'No post found for this message'))
         const result = await Post.update({
-            Locked,
-            Pinned,
+            ...Locked && Locked,
+            ...Pinned && Pinned,
         }, {
             where: {
                 MessageUuid: id,
@@ -225,7 +227,19 @@ const getReply = async (req, res, next) => {
         const reply = await Reply.findOne({
             where: {
                 MessageUuid: id,
-            }
+            },
+            include: [{
+                model: Message,
+                include: [{
+                    model: Engagement,
+                    include: [User, Reaction]
+                }, List, {
+                    model: View,
+                    include: User
+                },
+                    Attachment
+                ]
+            }, Reply]
         })
         if (!reply) return next(new HttpException(404, 'Message not found'))
         // Add view
@@ -251,7 +265,7 @@ const updateReply = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
-    const { PostUuid } = req.body
+    const { ReplyingTo, ReplyingToUuid, PostUuid } = req.body
     try {
         const reply = await Reply.findOne({
             where: {
@@ -260,7 +274,9 @@ const updateReply = async (req, res, next) => {
         })
         if (!reply) return next(new HttpException(404, 'No replies found for this message'))
         const result = await Reply.update({
-            PostUuid,
+            ...ReplyingTo && ReplyingTo,
+            ...ReplyingToUuid && ReplyingToUuid,
+            ...PostUuid && PostUuid,
         }, {
             where: {
                 MessageUuid: id,
