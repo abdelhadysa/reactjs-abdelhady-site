@@ -22,6 +22,9 @@ const Message = (sequelize, DataTypes) => {
 
 			// View
 			Message.hasMany(models.View, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+
+			// Attachment
+			Message.hasMany(models.Attachment, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
 		}
 	}
 	Message.init({
