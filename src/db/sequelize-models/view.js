@@ -9,7 +9,7 @@ const View = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// User
-			View.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+			View.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { onDelete: 'SET NULL', name: 'UserUuid' } })
 
 			// Message
 			View.belongsTo(models.Message, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
@@ -22,14 +22,8 @@ const View = (sequelize, DataTypes) => {
 			primaryKey: true,
 			allowNull: false,
 		},
-		UserUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		},
-		MessageUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		},
+		UserUuid: DataTypes.UUID,
+		MessageUuid: DataTypes.UUID,
 	}, {
 		sequelize,
 		modelName: 'View',
