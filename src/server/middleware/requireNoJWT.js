@@ -15,7 +15,7 @@ dotenv.config()
 
 const requireNoJWT = (req, _res, next) => {
     const token = req.signedCookies.token
-    if (token && token !== 'undefined') return next(new HttpException(400, 'User already logged in'))
+    if (token && token !== 'undefined') return next(new HttpException(403, 'User already logged in'))
     next()
 }
 
