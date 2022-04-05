@@ -14,6 +14,7 @@ const {
 	D_LOG_PERM, 
 	D_DEFAULT_PERM,
 	D_DEFAULT_REACTIONS,
+	D_ATTACHMENT_PERM,
 } = require('../../../server/utils/defaults')
 const crypto = require('crypto')
 module.exports = {
@@ -63,6 +64,7 @@ module.exports = {
 			...Object.values(D_TAG_PERM),
 			...Object.values(D_REACTION_PERM),
 			...Object.values(D_LOG_PERM),
+			...Object.values(D_ATTACHMENT_PERM),
 		].map((permission) => {
 			const permUuid = crypto.randomUUID()
 			permUuids.push(permUuid)
