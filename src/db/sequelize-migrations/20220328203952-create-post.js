@@ -28,7 +28,7 @@ module.exports = {
 					as: 'LastEditorUuid',
 				},
 				onDelete: 'SET NULL',
-				onUpdate: 'CASCADE',
+				onUpdate: 'SET NULL',
 			},
 			MessageUuid: {
 				type: Sequelize.UUID,
