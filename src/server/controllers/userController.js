@@ -2,10 +2,11 @@ import models, { sequelize } from 'Database/sequelize-models'
 import HttpException from '../utils/HttpException'
 import crypto from 'crypto'
 import { hashPass } from '../utils/bcryptManager'
+import { D_DEFAULT_MAX_ATTACHMENTS } from '../utils/defaults'
 
 // User
 
-const { User, Message, Post, Reply, Engagement, Reaction, Favorite, Grant, Role, Right, Permission } = models
+const { User, Message, Post, Reply, Engagement, Reaction, Favorite, Grant, Role, Right, Permission, Attachment } = models
 
 const getAll = async (req, res, next) => {
     try {
@@ -91,13 +92,13 @@ const createOne = async (req, res, next) => {
     const { Username, Password, Email, AvatarUrl } = req.body
     if (!Username || !Password) return next(new HttpException(400, 'Username or password not found'))
     try {
-        const hashedPass = await hashPass(Password)
+        const PasswordHash = Password ? await hashPass(Password) : undefined
         const result = await User.create({
             Uuid: crypto.randomUUID(),
-            Username,
-            PasswordHash: hashedPass,
-            Email,
-            AvatarUrl,
+            ...Username && Username,
+            ...PasswordHash && PasswordHash,
+            ...Email && Email,
+            ...AvatarUrl && AvatarUrl,
             Device: 'Unknown',
             IpAddress: null,
             LastVisit: null,
@@ -116,12 +117,12 @@ const updateOne = async (req, res, next) => {
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     const AvatarUrl = req.file !== undefined ? req.file.filename : undefined
     try {
-        const hashedPass = await hashPass(Password)
+        const PasswordHash = Password ? await hashPass(Password) : undefined
         const result = await User.update({
-            Username,
-            PasswordHash: hashedPass,
-            Email,
-            AvatarUrl,
+            ...Username && Username,
+            ...PasswordHash && PasswordHash,
+            ...Email && Email,
+            ...AvatarUrl && AvatarUrl,
         }, {
             where: {
                 Uuid: id,
@@ -203,6 +204,17 @@ const createPost = async (req, res, next) => {
             Locked: false,
             Pinned: false,
         }, { transaction: t })
+        if (req.files && req.files.length) {
+            for (const file of req.files) {
+                if(!file) continue
+                const fileName = file.filename
+                await Attachment.create({
+                    AttachmentUrl: fileName,
+                    UserUuid: user.Uuid,
+                    MessageUuid: message.Uuid,
+                }, { transaction: t })
+            }
+        }
         await t.commit()
         return res.status(200).json(post)
     } catch(e) {
@@ -232,14 +244,30 @@ const updatePost = async (req, res, next) => {
         })
         if(!post) throw new Error('Post not found')
         const result = await Message.update({
-            Title,
-            Text,
+            ...Title && Title,
+            ...Text && Text,
         }, { 
             where: {
                 Uuid: post.MessageUuid,
             }, transaction: t
          })
         await post.setPostLastEditor(user.Uuid, { transaction: t })
+        if (req.files && req.files.length) {
+            const message = await post.getMessage()
+            const attachments = await message.countAttachments()
+            if (attachments >= D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Message has too many attachments')
+            const totalAttachments = req.files.length + attachments
+            if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Exceeding the maximum allowed attachments by ' + totalAttachments - D_DEFAULT_MAX_ATTACHMENTS)
+            for (const file of req.files) {
+                if(!file) continue
+                const fileName = file.filename
+                await Attachment.create({
+                    AttachmentUrl: fileName,
+                    UserUuid: user.Uuid,
+                    MessageUuid: post.MessageUuid,
+                }, { transaction: t })
+            }
+        }
         await t.commit()
         return res.status(200).json(result)
     } catch(e) {
@@ -301,7 +329,7 @@ const getReplies = async (req, res, next) => {
 const createReply = async (req, res, next) => {
     if (!req.params.id || !req.params.postId) return next(new HttpException(400, 'Missing ID in request parameter'))
     if (!req.body) return next(new HttpException(400, 'Request body not found'))
-    const { id, postId } = req.params
+    const { id, postId, replyId } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     const { Title, Text } = req.body
     if (!Title || !Text) return next(new HttpException(400, 'Missing reply title or text'))
@@ -320,6 +348,22 @@ const createReply = async (req, res, next) => {
         })
         if (!post) throw new Error('Post not found')
         if (post.Locked === true) throw new Error('Post is locked')
+        let ReplyingTo
+        let ReplyingToUuid
+        if (replyId) {
+            const reply = await Reply.findOne({
+                where: {
+                    Uuid: replyId,
+                    PostUuid: postId,
+                }, transaction: t
+            })
+            if (!reply) throw new Error('Reply not found')
+            ReplyingTo = 'Reply'
+            ReplyingToUuid = replyId
+        } else {
+            ReplyingTo = 'Post'
+            ReplyingToUuid = postId
+        }
         const message = await Message.create({
             Uuid: crypto.randomUUID(),
             Title,
@@ -330,8 +374,21 @@ const createReply = async (req, res, next) => {
             AuthorUuid: user.Uuid,
             LastEditorUuid: null,
             MessageUuid: message.Uuid,
-            PostUuid: post.Uuid,
+            ReplyingTo,
+            ReplyingToUuid,
+            PostUuid: postId,
         }, { transaction: t })
+        if (req.files && req.files.length) {
+            for (const file of req.files) {
+                if(!file) continue
+                const fileName = file.filename
+                await Attachment.create({
+                    AttachmentUrl: fileName,
+                    UserUuid: user.Uuid,
+                    MessageUuid: message.Uuid,
+                }, { transaction: t })
+            }
+        }
         await t.commit()
         return res.status(200).json(reply)
     } catch(e) {
@@ -361,14 +418,30 @@ const updateReply = async (req, res, next) => {
         })
         if(!reply) throw new Error('Reply not found')
         const result = await Message.update({
-            Title,
-            Text,
+            ...Title && Title,
+            ...Text && Text,
         }, { 
             where: {
                 Uuid: reply.MessageUuid,
             }, transaction: t
         })
         await reply.setReplyLastEditor(user.Uuid, { transaction: t })
+        if (req.files && req.files.length) {
+            const message = await reply.getMessage()
+            const attachments = await message.countAttachments()
+            if (attachments >= D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Message has too many attachments')
+            const totalAttachments = req.files.length + attachments
+            if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Exceeding the maximum allowed attachments by ' + totalAttachments - D_DEFAULT_MAX_ATTACHMENTS)
+            for (const file of req.files) {
+                if(!file) continue
+                const fileName = file.filename
+                await Attachment.create({
+                    AttachmentUrl: fileName,
+                    UserUuid: user.Uuid,
+                    MessageUuid: reply.MessageUuid,
+                }, { transaction: t })
+            }
+        }
         await t.commit()
         return res.status(200).json(result)
     } catch(e) {
