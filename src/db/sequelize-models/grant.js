@@ -22,14 +22,8 @@ const Grant = (sequelize, DataTypes) => {
 			primaryKey: true,
 			allowNull: false,
 		},
-		UserUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		},
-		RoleUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		}
+		UserUuid: DataTypes.UUID,
+		RoleUuid: DataTypes.UUID
 	}, {
 		sequelize,
 		modelName: 'Grant',
