@@ -9,14 +9,18 @@ const Reply = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// User
-			Reply.belongsTo(models.User.scope('hideSensitive'), { as: 'ReplyAuthor', foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
-			Reply.belongsTo(models.User.scope('hideSensitive'), { as: 'ReplyLastEditor', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid', allowNull: true } })
+			Reply.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
+			Reply.belongsTo(models.User.scope('hideSensitive'), { as: 'ReplyLastEditor', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid' } })
 
 			// Message
 			Reply.belongsTo(models.Message, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
 
 			// Post
-			Reply.belongsTo(models.Post, { foreignKey: { onDelete: 'CASCADE', name: 'PostUuid', allowNull: false } })
+			Reply.belongsTo(models.Post, { foreignKey: { onDelete: 'CASCADE', name: 'PostUuid', allowNull: false }, as: 'Parent' })
+			Reply.belongsTo(models.Post, { foreignKey: 'ReplyingToUuid', constraints: false, as: 'Post' })
+
+			// Reply
+			Reply.hasMany(models.Reply, { foreignKey: 'ReplyingToUuid', constraints: false, scope: { ReplyingTo: 'Reply' } })
 		}
 	}
 	Reply.init({
@@ -26,22 +30,12 @@ const Reply = (sequelize, DataTypes) => {
 			primaryKey: true,
 			allowNull: false,
 		},
-		AuthorUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		},
-		LastEditorUuid: {
-			type: DataTypes.UUID,
-			allowNull: true,
-		},
-		MessageUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		},
-		PostUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		}
+		AuthorUuid: DataTypes.UUID,
+		LastEditorUuid: DataTypes.UUID,
+		MessageUuid: DataTypes.UUID,
+		ReplyingTo: DataTypes.STRING,
+		ReplyingToUuid: DataTypes.UUID,
+		PostUuid: DataTypes.UUID,
 	}, {
 		sequelize,
 		modelName: 'Reply',
