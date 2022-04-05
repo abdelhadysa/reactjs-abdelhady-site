@@ -10,14 +10,14 @@ module.exports = {
 			},
 			UserUuid: {
 				type: Sequelize.UUID,
-				allowNull: false,
+				allowNull: true,
 				references: {
 					model: 'Users',
 					key: 'Uuid',
 					as: 'UserUuid',
 				},
-				onDelete: 'CASCADE',
-				onUpdate: 'CASCADE',
+				onDelete: 'SET NULL',
+				onUpdate: 'SET NULL',
 			},
 			MessageUuid: {
 				type: Sequelize.UUID,
