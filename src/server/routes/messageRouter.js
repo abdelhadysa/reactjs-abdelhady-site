@@ -20,12 +20,12 @@ messageRouter.post('/', [requirePerm(D_MESSAGE_PERM.CREATE), messageController.c
 messageRouter.put('/:id', [requirePerm(D_MESSAGE_PERM.UPDATE), messageController.updateOne])
 messageRouter.delete('/:id', [requirePerm(D_MESSAGE_PERM.DELETE), messageController.deleteOne])
 
-messageRouter.get('/post', [requirePerm(D_MESSAGE_PERM.GET_POSTS), messageController.getPosts])
+messageRouter.get('/post/all', [requirePerm(D_MESSAGE_PERM.GET_POSTS), messageController.getPosts])
 messageRouter.get('/:id/post', [requirePerm(D_MESSAGE_PERM.GET_POST), messageController.getPost])
 messageRouter.put('/:id/post', [requirePerm(D_MESSAGE_PERM.UPDATE_POST), messageController.updatePost])
 messageRouter.delete('/:id/post', [requirePerm(D_MESSAGE_PERM.DELETE_POST), messageController.deletePost])
 
-messageRouter.get('/reply', [requirePerm(D_MESSAGE_PERM.GET_REPLIES), messageController.getReplies])
+messageRouter.get('/reply/all', [requirePerm(D_MESSAGE_PERM.GET_REPLIES), messageController.getReplies])
 messageRouter.get('/:id/reply', [requirePerm(D_MESSAGE_PERM.GET_REPLY), messageController.getReply])
 messageRouter.put('/:id/reply', [requirePerm(D_MESSAGE_PERM.UPDATE_REPLY), messageController.updateReply])
 messageRouter.delete('/:id/reply', [requirePerm(D_MESSAGE_PERM.DELETE_REPLY), messageController.deleteReply])
