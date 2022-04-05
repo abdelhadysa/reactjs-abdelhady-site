@@ -257,7 +257,7 @@ const updatePost = async (req, res, next) => {
             const attachments = await message.countAttachments()
             if (attachments >= D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Message has too many attachments')
             const totalAttachments = req.files.length + attachments
-            if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Exceeding the maximum allowed attachments by ' + totalAttachments - D_DEFAULT_MAX_ATTACHMENTS)
+            if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error(`Exceeding the maximum allowed attachments by ${totalAttachments - D_DEFAULT_MAX_ATTACHMENTS}`)
             for (const file of req.files) {
                 if(!file) continue
                 const fileName = file.filename
@@ -431,7 +431,7 @@ const updateReply = async (req, res, next) => {
             const attachments = await message.countAttachments()
             if (attachments >= D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Message has too many attachments')
             const totalAttachments = req.files.length + attachments
-            if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Exceeding the maximum allowed attachments by ' + totalAttachments - D_DEFAULT_MAX_ATTACHMENTS)
+            if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error(`Exceeding the maximum allowed attachments by ${totalAttachments - D_DEFAULT_MAX_ATTACHMENTS}`)
             for (const file of req.files) {
                 if(!file) continue
                 const fileName = file.filename
