@@ -24,14 +24,8 @@ const Right = (sequelize, DataTypes) => {
 			primaryKey: true,
 			allowNull: false,
 		},
-		RoleUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		},
-		PermissionUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		}
+		RoleUuid: DataTypes.UUID,
+		PermissionUuid: DataTypes.UUID
 	}, {
 		sequelize,
 		modelName: 'Right',
