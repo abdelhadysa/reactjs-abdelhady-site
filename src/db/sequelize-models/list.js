@@ -45,14 +45,8 @@ const List = (sequelize, DataTypes) => {
 			},
 			defaultValue: '#000000',
 		},
-		MessageUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		},
-		TagUuid: {
-			type: DataTypes.UUID,
-			allowNull: false,
-		}
+		MessageUuid: DataTypes.UUID,
+		TagUuid: DataTypes.UUID
 	}, {
 		sequelize,
 		modelName: 'List',
