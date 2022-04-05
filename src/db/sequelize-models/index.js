@@ -22,6 +22,7 @@ import Tag from './tag'
 import User from './user'
 import Reaction from './reaction'
 import View from './view'
+import Attachment from './attachment'
 
 let sequelize;
 if (config.use_env_variable) {
@@ -46,6 +47,7 @@ const models = {
 	List: List(sequelize, Sequelize.DataTypes),
 	Right: Right(sequelize, Sequelize.DataTypes),
 	View: View(sequelize, Sequelize.DataTypes),
+	Attachment: Attachment(sequelize, Sequelize.DataTypes),
 };
 
 //require.context(__dirname, false, /^((?!index).)*\.js$/)
