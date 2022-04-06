@@ -38,7 +38,8 @@ const refreshJWT = async (req, res, next) => {
         // Update User Meta Data
         User.update({
             IpAddress: req.ip,
-            Device: req.device.type.charAt(0).toUpperCase() + req.device.type.slice(1)
+            Device: req.device.type.charAt(0).toUpperCase() + req.device.type.slice(1),
+            LastVisit: new Date(),
         }, {
             where: {
                 Uuid: decoded.uuid,
