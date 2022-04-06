@@ -358,6 +358,7 @@ const createReply = async (req, res, next) => {
                 }, transaction: t
             })
             if (!reply) throw new Error('Reply not found')
+            if (reply.ReplyingTo !== 'Post') throw new Error('Cannot reply to deeply nested replies')
             ReplyingTo = 'Reply'
             ReplyingToUuid = replyId
         } else {
@@ -455,21 +456,38 @@ const deleteReply = async (req, res, next) => {
     const { id, replyId } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     try {
+        const t = await sequelize.transaction()
         const user = await User.findOne({
             where: {
                 Uuid: id,
-            }
+            }, transaction: t
         })
-        if (!user) return next(new HttpException(404, 'User not found'))
+        if (!user) throw new Error('User not found')
         const reply = await Reply.findOne({
             where: {
                 Uuid: replyId,
-            }
+            }, transaction: t
         })
-        if(!reply) return next(new HttpException(404, 'Reply not found'))
-        const result = await reply.destroy()
+        if(!reply) throw new Error('Reply not found')
+        const otherReplies = await Reply.findAll({
+            where: {
+                ReplyingTo: 'Reply',
+                ReplyingToUuid: replyId,
+            }, transaction: t
+        })
+        if (otherReplies.length) {
+            for (const otherReply of otherReplies) {
+                await otherReply.update({
+                    ReplyingTo: 'Post',
+                    ReplyingToUuid: otherReply.PostUuid,
+                }, { transaction: t })
+            }
+        }
+        const result = await reply.destroy({ transaction: t })
+        await t.commit()
         return res.status(200).json(result)
     } catch(e) {
+        await t.rollback()
         return next(new HttpException(500, e))
     }
 }
