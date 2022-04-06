@@ -56,8 +56,8 @@ const createOne = async (req, res, next) => {
     if (!Title || !Text) return next(new HttpException(400, 'Missing title or text of the message'))
     try {
         const result = await Message.create({
-            ...Title && Title,
-            ...Text && Text,
+            ...Title && {Title},
+            ...Text && {Text},
         })
         return res.status(200).json(result)
     } catch (e) {
@@ -73,8 +73,8 @@ const updateOne = async (req, res, next) => {
     if (!Title || !Text) return next(new HttpException(400, 'Missing title or text of the message'))
     try {
         const result = await Message.update({
-            ...Title && Title,
-            ...Text && Text,
+            ...Title && {Title},
+            ...Text && {Text},
         }, {
             where: {
                 Uuid: id,
@@ -174,8 +174,8 @@ const updatePost = async (req, res, next) => {
         })
         if (!post) return next(new HttpException(404, 'No post found for this message'))
         const result = await Post.update({
-            ...Locked && Locked,
-            ...Pinned && Pinned,
+            ...Locked && {Locked},
+            ...Pinned && {Pinned},
         }, {
             where: {
                 MessageUuid: id,

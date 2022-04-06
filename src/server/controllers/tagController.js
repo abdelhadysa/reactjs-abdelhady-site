@@ -33,9 +33,9 @@ const createOne = async (req, res, next) => {
     const { Name, Color, Featured } = req.body
     try {
         const tag = await Tag.create({
-            ...Name && Name,
-            ...Color && Color,
-            ...Featured && Featured,
+            ...Name && {Name},
+            ...Color && {Color},
+            ...Featured && {Featured},
         })
         return res.status(200).json(tag)
     } catch(e) {
@@ -50,9 +50,9 @@ const updateOne = async (req, res, next) => {
     const { Name, Color, Featured } = req.body
     try {
         const tag = await Tag.update({
-            ...Name && Name,
-            ...Color && Color,
-            ...Featured && Featured,
+            ...Name && {Name},
+            ...Color && {Color},
+            ...Featured && {Featured},
         }, {
             where: {
                 Uuid: id,

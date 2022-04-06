@@ -33,14 +33,14 @@ const createOne = async (req, res, next) => {
     const { Message, UserUuid, Username, Role, Super, Permission, Level, IpAddress } = req.body
     try {
         const log = await Log.create({
-            ...Message && Message,
-            ...UserUuid && UserUuid,
-            ...Username && Username,
-            ...Role && Role,
-            ...Super && Super,
-            ...Permission && Permission,
-            ...Level && Level,
-            ...IpAddress && IpAddress,
+            ...Message && {Message},
+            ...UserUuid && {UserUuid},
+            ...Username && {Username},
+            ...Role && {Role},
+            ...Super && {Super},
+            ...Permission && {Permission},
+            ...Level && {Level},
+            ...IpAddress && {IpAddress},
         })
         return res.status(200).json(log)
     } catch (e) {
@@ -55,14 +55,14 @@ const updateOne = async (req, res, next) => {
     const { Message, UserUuid, Username, Role, Super, Permission, Level, IpAddress } = req.body
     try {
         const log = await Log.update({
-            ...Message && Message,
-            ...UserUuid && UserUuid,
-            ...Username && Username,
-            ...Role && Role,
-            ...Super && Super,
-            ...Permission && Permission,
-            ...Level && Level,
-            ...IpAddress && IpAddress,
+            ...Message && {Message},
+            ...UserUuid && {UserUuid},
+            ...Username && {Username},
+            ...Role && {Role},
+            ...Super && {Super},
+            ...Permission && {Permission},
+            ...Level && {Level},
+            ...IpAddress && {IpAddress},
         }, {
             where: {
                 Uuid: id,

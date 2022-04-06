@@ -31,7 +31,7 @@ const register = async (req, res, next) => {
         const user = await User.create({
             Username: Username,
             PasswordHash: hashedPass,
-            Email,
+            ...Email && {Email},
         }, { transaction: t })
         const userRole = await Role.scope('defaultUser').findOne({ transaction: t })
         await Grant.create({

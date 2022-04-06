@@ -95,10 +95,10 @@ const createOne = async (req, res, next) => {
         const PasswordHash = Password ? await hashPass(Password) : undefined
         const result = await User.create({
             Uuid: crypto.randomUUID(),
-            ...Username && Username,
-            ...PasswordHash && PasswordHash,
-            ...Email && Email,
-            ...AvatarUrl && AvatarUrl,
+            ...Username && {Username},
+            ...PasswordHash && {PasswordHash},
+            ...Email && {Email},
+            ...AvatarUrl && {AvatarUrl},
             Device: 'Unknown',
             IpAddress: null,
             LastVisit: null,
@@ -119,10 +119,10 @@ const updateOne = async (req, res, next) => {
     try {
         const PasswordHash = Password ? await hashPass(Password) : undefined
         const result = await User.update({
-            ...Username && Username,
-            ...PasswordHash && PasswordHash,
-            ...Email && Email,
-            ...AvatarUrl && AvatarUrl,
+            ...Username && {Username},
+            ...PasswordHash && {PasswordHash},
+            ...Email && {Email},
+            ...AvatarUrl && {AvatarUrl},
         }, {
             where: {
                 Uuid: id,
@@ -244,8 +244,8 @@ const updatePost = async (req, res, next) => {
         })
         if(!post) throw new Error('Post not found')
         const result = await Message.update({
-            ...Title && Title,
-            ...Text && Text,
+            ...Title && {Title},
+            ...Text && {Text},
         }, { 
             where: {
                 Uuid: post.MessageUuid,
@@ -419,8 +419,8 @@ const updateReply = async (req, res, next) => {
         })
         if(!reply) throw new Error('Reply not found')
         const result = await Message.update({
-            ...Title && Title,
-            ...Text && Text,
+            ...Title && {Title},
+            ...Text && {Text},
         }, { 
             where: {
                 Uuid: reply.MessageUuid,

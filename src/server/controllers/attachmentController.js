@@ -41,10 +41,10 @@ const createOne = async (req, res, next) => {
         const attachment = await Attachment.create({
             Uuid: crypto.randomUUID(),
             ...Name && Name,
-            ...Description && Description,
-            ...AttachmentUrl && AttachmentUrl,
-            ...MessageUuid && MessageUuid,
-            ...UserUuid && UserUuid,
+            ...Description && {Description},
+            ...AttachmentUrl && {AttachmentUrl},
+            ...MessageUuid && {MessageUuid},
+            ...UserUuid && {UserUuid},
         })
         return res.status(200).json(attachment)
     } catch (e) {
@@ -63,10 +63,10 @@ const updateOne = async (req, res, next) => {
         const attachment = await Attachment.update({
             Uuid: crypto.randomUUID(),
             ...Name && Name,
-            ...Description && Description,
-            ...AttachmentUrl && AttachmentUrl,
-            ...MessageUuid && MessageUuid,
-            ...UserUuid && UserUuid,
+            ...Description && {Description},
+            ...AttachmentUrl && {AttachmentUrl},
+            ...MessageUuid && {MessageUuid},
+            ...UserUuid && {UserUuid},
         }, {
             where: {
                 Uuid: id,
