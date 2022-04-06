@@ -28,6 +28,7 @@ module.exports = {
 			Super: Sequelize.STRING,
 			Permission: Sequelize.STRING,
 			Level: Sequelize.STRING,
+			IpAddress: Sequelize.STRING,
 			CreatedAt: {
 				allowNull: false,
 				type: Sequelize.DATE
