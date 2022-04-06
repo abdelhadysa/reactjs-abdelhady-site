@@ -267,23 +267,38 @@ const updateReply = async (req, res, next) => {
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
     const { ReplyingTo, ReplyingToUuid, PostUuid } = req.body
     try {
+        const t = await sequelize.transaction()
         const reply = await Reply.findOne({
             where: {
                 MessageUuid: id,
-            }
+            }, transaction: t
         })
-        if (!reply) return next(new HttpException(404, 'No replies found for this message'))
-        const result = await Reply.update({
+        if (!reply) throw new Error('No replies found for this message')
+        if (ReplyingTo || ReplyingToUuid || PostUuid) {
+            const otherReplies = await Reply.findAll({
+                where: {
+                    ReplyingTo: 'Reply',
+                    ReplyingToUuid: reply.Uuid,
+                }, transaction: t
+            })
+            if (otherReplies.length) {
+                for (const otherReply of otherReplies) {
+                    await otherReply.update({
+                        ReplyingTo: 'Post',
+                        ReplyingToUuid: otherReply.PostUuid,
+                    }, { transaction: t })
+                }
+            }
+        }
+        const result = await reply.update({
             ...ReplyingTo && ReplyingTo,
             ...ReplyingToUuid && ReplyingToUuid,
             ...PostUuid && PostUuid,
-        }, {
-            where: {
-                MessageUuid: id,
-            }
-        })
+        }, { transaction: t })
+        await t.commit()
         return res.status(200).json(result)
     } catch (e) {
+        await t.rollback()
         return next(new HttpException(500, e))
     }
 }
@@ -292,13 +307,32 @@ const deleteReply = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
     try {
-        const reply = await Reply.destroy({
+        const t = await sequelize.transaction()
+        const reply = await Reply.findOne({
             where: {
                 MessageUuid: id,
-            }
+            }, transaction: t
         })
-        return res.status(200).json(reply)
+        if(!reply) throw new Error('Reply not found')
+        const otherReplies = await Reply.findAll({
+            where: {
+                ReplyingTo: 'Reply',
+                ReplyingToUuid: reply.Uuid,
+            }, transaction: t
+        })
+        if (otherReplies.length) {
+            for (const otherReply of otherReplies) {
+                await otherReply.update({
+                    ReplyingTo: 'Post',
+                    ReplyingToUuid: otherReply.PostUuid,
+                }, { transaction: t })
+            }
+        }
+        const result = await reply.destroy({ transaction: t })
+        await t.commit()
+        return res.status(200).json(result)
     } catch (e) {
+        await t.rollback()
         return next(new HttpException(500, e))
     }
 }
