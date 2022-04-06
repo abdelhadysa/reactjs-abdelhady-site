@@ -30,7 +30,14 @@ const Log = (sequelize, DataTypes) => {
 		Super: DataTypes.STRING,
 		Permission: DataTypes.STRING,
 		Level: DataTypes.STRING,
-		IpAddress: DataTypes.STRING,
+		IpAddress: {
+			type: DataTypes.STRING,
+			allowNull: true,
+			validate: {
+				isIP: true,
+				len: [3, 39],
+			},
+		},
 }, {
 		sequelize,
 		modelName: 'Log',
