@@ -97,9 +97,9 @@ const createOne = async (req, res, next) => {
             Uuid: crypto.randomUUID(),
             ...Username && {Username},
             ...PasswordHash && {PasswordHash},
-            ...Email && {Email},
-            ...AvatarUrl && {AvatarUrl},
-            Device: 'Unknown',
+            ...(Email || Email === null) && {Email},
+            ...(AvatarUrl || AvatarUrl === null) && {AvatarUrl},
+            Device: null,
             IpAddress: null,
             LastVisit: null,
         })
@@ -121,8 +121,8 @@ const updateOne = async (req, res, next) => {
         const result = await User.update({
             ...Username && {Username},
             ...PasswordHash && {PasswordHash},
-            ...Email && {Email},
-            ...AvatarUrl && {AvatarUrl},
+            ...(Email || Email === null) && {Email},
+            ...(AvatarUrl || AvatarUrl === null) && {AvatarUrl},
         }, {
             where: {
                 Uuid: id,

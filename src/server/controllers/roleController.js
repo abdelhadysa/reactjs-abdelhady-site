@@ -35,9 +35,9 @@ const createOne = async (req, res, next) => {
         const role = await Role.create({
             ...Name && {Name},
             ...Description && {Description},
-            ...Order && {Order},
+            ...(Order || Order === 0) && {Order},
             ...Color && {Color},
-            ...Super && {Super},
+            ...(Super === true || Super === false) && {Super},
         })
         return res.status(200).json(role)
     } catch(e) {
@@ -54,9 +54,9 @@ const updateOne = async (req, res, next) => {
         const role = await Role.update({
             ...Name && {Name},
             ...Description && {Description},
-            ...Order && {Order},
+            ...(Order || Order === 0) && {Order},
             ...Color && {Color},
-            ...Super && {Super},
+            ...(Super === true || Super === false) && {Super},
         }, {
             where: {
                 Uuid: id,

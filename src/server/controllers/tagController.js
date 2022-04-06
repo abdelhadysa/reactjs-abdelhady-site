@@ -35,7 +35,7 @@ const createOne = async (req, res, next) => {
         const tag = await Tag.create({
             ...Name && {Name},
             ...Color && {Color},
-            ...Featured && {Featured},
+            ...(Featured === true || Featured === false) && {Featured},
         })
         return res.status(200).json(tag)
     } catch(e) {
@@ -52,7 +52,7 @@ const updateOne = async (req, res, next) => {
         const tag = await Tag.update({
             ...Name && {Name},
             ...Color && {Color},
-            ...Featured && {Featured},
+            ...(Featured === true || Featured === false) && {Featured},
         }, {
             where: {
                 Uuid: id,
