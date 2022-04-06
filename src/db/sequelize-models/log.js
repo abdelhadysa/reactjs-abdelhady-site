@@ -27,7 +27,7 @@ const Log = (sequelize, DataTypes) => {
 		UserUuid: DataTypes.UUID,
 		Username: DataTypes.STRING,
 		Role: DataTypes.STRING,
-		Super: DataTypes.STRING,
+		Super: DataTypes.BOOLEAN,
 		Permission: DataTypes.STRING,
 		Level: DataTypes.STRING,
 		IpAddress: {

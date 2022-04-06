@@ -24,7 +24,7 @@ module.exports = {
 			},
 			Username: Sequelize.STRING,
 			Role: Sequelize.STRING,
-			Super: Sequelize.STRING,
+			Super: Sequelize.BOOLEAN,
 			Permission: Sequelize.STRING,
 			Level: Sequelize.STRING,
 			IpAddress: Sequelize.STRING,
