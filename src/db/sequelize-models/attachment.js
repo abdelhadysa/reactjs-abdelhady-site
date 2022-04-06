@@ -23,7 +23,13 @@ const Attachment = (sequelize, DataTypes) => {
 		},
 		Name: DataTypes.STRING,
 		Description: DataTypes.STRING,
-		AttachmentUrl: DataTypes.STRING,
+		AttachmentUrl: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			validate: {
+				notEmpty: true,
+			},
+		},
 		UserUuid: DataTypes.UUID,
 		MessageUuid: DataTypes.UUID,
 	}, {

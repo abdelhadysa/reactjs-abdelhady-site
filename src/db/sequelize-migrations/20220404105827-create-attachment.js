@@ -14,7 +14,8 @@ module.exports = {
 				type: Sequelize.STRING
 			},
 			AttachmentUrl: {
-				type: Sequelize.STRING
+				type: Sequelize.STRING,
+				allowNull: false,
 			},
 			UserUuid: {
 				type: Sequelize.UUID,
