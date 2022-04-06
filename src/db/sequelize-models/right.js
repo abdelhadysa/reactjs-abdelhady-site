@@ -11,10 +11,10 @@ const Right = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// Role
-			Right.belongsTo(models.Role, { foreignKey: { onDelete: 'CASCADE', name: 'RoleUuid', allowNull: false } })
+			Right.belongsTo(models.Role, { foreignKey: { name: 'RoleUuid', allowNull: false } })
 
 			// Permission
-			Right.belongsTo(models.Permission, { foreignKey: { onDelete: 'CASCADE', name: 'PermissionUuid', allowNull: false } })
+			Right.belongsTo(models.Permission, { foreignKey: { name: 'PermissionUuid', allowNull: false } })
 		}
 	}
 	Right.init({
@@ -22,7 +22,6 @@ const Right = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		RoleUuid: DataTypes.UUID,
 		PermissionUuid: DataTypes.UUID

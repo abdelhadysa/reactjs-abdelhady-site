@@ -11,10 +11,10 @@ const Role = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// Grant
-			Role.hasMany(models.Grant, { foreignKey: { onDelete: 'CASCADE', name: 'RoleUuid', allowNull: false } })
+			Role.hasMany(models.Grant, { foreignKey: { name: 'RoleUuid', allowNull: false } })
 
 			// Right
-			Role.hasMany(models.Right, { foreignKey: { onDelete: 'CASCADE', name: 'RoleUuid', allowNull: false } })
+			Role.hasMany(models.Right, { foreignKey: { name: 'RoleUuid', allowNull: false } })
 
 			// User
 			Role.belongsToMany(models.User.scope('hideSensitive'), { through: models.Grant })
@@ -28,7 +28,6 @@ const Role = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		Name: {
 			type: DataTypes.STRING,

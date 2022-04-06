@@ -9,10 +9,10 @@ const List = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// Message
-			List.belongsTo(models.Message, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			List.belongsTo(models.Message, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 
 			// Tag
-			List.belongsTo(models.Tag, { foreignKey: { onDelete: 'CASCADE', name: 'TagUuid', allowNull: false } })
+			List.belongsTo(models.Tag, { foreignKey: { name: 'TagUuid', allowNull: false } })
 		}
 	}
 	List.init({
@@ -20,7 +20,6 @@ const List = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		Name: {
 			type: DataTypes.STRING,

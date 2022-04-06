@@ -9,10 +9,10 @@ const Tag = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// Favorite
-			Tag.hasMany(models.Favorite, { foreignKey: { onDelete: 'CASCADE', name: 'TagUuid', allowNull: false } })
+			Tag.hasMany(models.Favorite, { foreignKey: { name: 'TagUuid', allowNull: false } })
 
 			// List
-			Tag.hasMany(models.List, { foreignKey: { onDelete: 'CASCADE', name: 'TagUuid', allowNull: false } })
+			Tag.hasMany(models.List, { foreignKey: { name: 'TagUuid', allowNull: false } })
 		}
 	}
 	Tag.init({
@@ -20,7 +20,6 @@ const Tag = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		Name: {
 			type: DataTypes.STRING,

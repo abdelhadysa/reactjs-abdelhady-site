@@ -9,10 +9,10 @@ const Attachment = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// User
-			Attachment.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+			Attachment.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { name: 'UserUuid', allowNull: false } })
 
 			// Message
-			Attachment.belongsTo(models.Message, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			Attachment.belongsTo(models.Message, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 		}
 	}
 	Attachment.init({
@@ -20,7 +20,6 @@ const Attachment = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		Name: DataTypes.STRING,
 		Description: DataTypes.STRING,

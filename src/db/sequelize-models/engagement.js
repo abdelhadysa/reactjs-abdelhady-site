@@ -9,13 +9,13 @@ const Engagement = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// User
-			Engagement.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { onDelete: 'SET NULL', name: 'UserUuid' } })
+			Engagement.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { name: 'UserUuid', allowNull: true } })
 
 			// Message
-			Engagement.belongsTo(models.Message, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			Engagement.belongsTo(models.Message, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 
 			// Reaction
-			Engagement.belongsTo(models.Reaction, { foreignKey: { onDelete: 'CASCADE', name: 'ReactionUuid', allowNull: false } })
+			Engagement.belongsTo(models.Reaction, { foreignKey: { name: 'ReactionUuid', allowNull: false } })
 		}
 	}
 	Engagement.init({
@@ -23,7 +23,6 @@ const Engagement = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		UserUuid: DataTypes.UUID,
 		MessageUuid: DataTypes.UUID,

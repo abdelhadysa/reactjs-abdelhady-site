@@ -9,30 +9,30 @@ const User = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// Post
-			User.hasMany(models.Post, { foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
-			User.hasMany(models.Post, { as: 'EditedPost', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid' } })
+			User.hasMany(models.Post, { foreignKey: { name: 'AuthorUuid', allowNull: false } })
+			User.hasMany(models.Post, { as: 'EditedPost', foreignKey: { name: 'LastEditorUuid', allowNull: true } })
 
 			// Reply
-			User.hasMany(models.Reply, { foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
-			User.hasMany(models.Reply, { as: 'EditedReply', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid' } })
+			User.hasMany(models.Reply, { foreignKey: { name: 'AuthorUuid', allowNull: false } })
+			User.hasMany(models.Reply, { as: 'EditedReply', foreignKey: { name: 'LastEditorUuid', allowNull: true } })
 
 			// Grant
-			User.hasMany(models.Grant, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+			User.hasMany(models.Grant, { foreignKey: { name: 'UserUuid', allowNull: false } })
 
 			// Engagement
-			User.hasMany(models.Engagement, { foreignKey: { onDelete: 'SET NULL', name: 'UserUuid' } })
+			User.hasMany(models.Engagement, { foreignKey: { name: 'UserUuid', allowNull: true } })
 
 			// Favorite
-			User.hasMany(models.Favorite, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+			User.hasMany(models.Favorite, { foreignKey: { name: 'UserUuid', allowNull: false } })
 
 			// Role
 			User.belongsToMany(models.Role, { through: models.Grant })
 
 			// View
-			User.hasMany(models.View, { foreignKey: { onDelete: 'SET NULL', name: 'UserUuid' } })
+			User.hasMany(models.View, { foreignKey: { name: 'UserUuid', allowNull: true } })
 
 			// Attachment
-			User.hasMany(models.Attachment, { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+			User.hasMany(models.Attachment, { foreignKey: { name: 'UserUuid', allowNull: false } })
 		}
 	}
 	User.init({
@@ -40,7 +40,6 @@ const User = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		Username: {
 			type: DataTypes.STRING,

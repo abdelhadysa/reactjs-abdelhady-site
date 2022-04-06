@@ -8,7 +8,7 @@ const Log = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Log.belongsTo(models.User, { foreignKey: { onDelete: 'SET NULL', onUpdate: 'SET NULL', name: 'UserUuid', allowNull: true } })
+			Log.belongsTo(models.User, { foreignKey: { name: 'UserUuid', allowNull: true } })
 		}
 	}
 	Log.init({
@@ -16,7 +16,6 @@ const Log = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		Message: {
 			type: DataTypes.STRING,

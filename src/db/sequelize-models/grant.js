@@ -9,10 +9,10 @@ const Grant = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// User
-			Grant.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { onDelete: 'CASCADE', name: 'UserUuid', allowNull: false } })
+			Grant.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { name: 'UserUuid', allowNull: false } })
 
 			// Role
-			Grant.belongsTo(models.Role, { foreignKey: { onDelete: 'CASCADE', name: 'RoleUuid', allowNull: false } })
+			Grant.belongsTo(models.Role, { foreignKey: { name: 'RoleUuid', allowNull: false } })
 		}
 	}
 	Grant.init({
@@ -20,7 +20,6 @@ const Grant = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		UserUuid: DataTypes.UUID,
 		RoleUuid: DataTypes.UUID

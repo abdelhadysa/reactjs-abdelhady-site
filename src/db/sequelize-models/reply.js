@@ -9,14 +9,14 @@ const Reply = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// User
-			Reply.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { onDelete: 'CASCADE', name: 'AuthorUuid', allowNull: false } })
-			Reply.belongsTo(models.User.scope('hideSensitive'), { as: 'ReplyLastEditor', foreignKey: { onDelete: 'SET NULL', name: 'LastEditorUuid' } })
+			Reply.belongsTo(models.User.scope('hideSensitive'), { foreignKey: { name: 'AuthorUuid', allowNull: false } })
+			Reply.belongsTo(models.User.scope('hideSensitive'), { as: 'ReplyLastEditor', foreignKey: { name: 'LastEditorUuid', allowNull: true } })
 
 			// Message
-			Reply.belongsTo(models.Message, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			Reply.belongsTo(models.Message, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 
 			// Post
-			Reply.belongsTo(models.Post, { foreignKey: { onDelete: 'CASCADE', name: 'PostUuid', allowNull: false }, as: 'Parent' })
+			Reply.belongsTo(models.Post, { foreignKey: { name: 'PostUuid', allowNull: false }, as: 'Parent' })
 			Reply.belongsTo(models.Post, { foreignKey: 'ReplyingToUuid', constraints: false, as: 'Post' })
 
 			// Reply
@@ -28,7 +28,6 @@ const Reply = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		AuthorUuid: DataTypes.UUID,
 		LastEditorUuid: DataTypes.UUID,

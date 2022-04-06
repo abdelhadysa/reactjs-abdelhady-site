@@ -9,7 +9,7 @@ const Reaction = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// Engagement
-			Reaction.hasMany(models.Engagement, { foreignKey: { onDelete: 'CASCADE', name: 'ReactionUuid', allowNull: false } })
+			Reaction.hasMany(models.Engagement, { foreignKey: { name: 'ReactionUuid', allowNull: false } })
 		}
 	}
 	Reaction.init({
@@ -17,7 +17,6 @@ const Reaction = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		Name: {
 			type: DataTypes.STRING,

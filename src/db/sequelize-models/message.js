@@ -9,22 +9,22 @@ const Message = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// Post
-			Message.hasOne(models.Post, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			Message.hasOne(models.Post, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 
 			// Reply
-			Message.hasOne(models.Reply, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			Message.hasOne(models.Reply, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 
 			// Engagement
-			Message.hasMany(models.Engagement, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			Message.hasMany(models.Engagement, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 
 			// List
-			Message.hasMany(models.List, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			Message.hasMany(models.List, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 
 			// View
-			Message.hasMany(models.View, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			Message.hasMany(models.View, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 
 			// Attachment
-			Message.hasMany(models.Attachment, { foreignKey: { onDelete: 'CASCADE', name: 'MessageUuid', allowNull: false } })
+			Message.hasMany(models.Attachment, { foreignKey: { name: 'MessageUuid', allowNull: false } })
 		}
 	}
 	Message.init({
@@ -32,7 +32,6 @@ const Message = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		Title: {
 			type: DataTypes.STRING,

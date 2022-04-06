@@ -9,7 +9,7 @@ const Permission = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// Right
-			Permission.hasMany(models.Right, { foreignKey: { onDelete: 'CASCADE', name: 'PermissionUuid', allowNull: false } })
+			Permission.hasMany(models.Right, { foreignKey: { name: 'PermissionUuid', allowNull: false } })
 
 			// Role
 			Permission.belongsToMany(models.Role, { through: models.Right })
@@ -20,7 +20,6 @@ const Permission = (sequelize, DataTypes) => {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
-			allowNull: false,
 		},
 		Name: {
 			type: DataTypes.STRING,
