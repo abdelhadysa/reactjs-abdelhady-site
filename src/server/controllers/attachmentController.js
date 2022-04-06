@@ -40,7 +40,7 @@ const createOne = async (req, res, next) => {
         if (!AttachmentUrl) return next(new HttpException(400, 'Invalid attachment file'))
         const attachment = await Attachment.create({
             Uuid: crypto.randomUUID(),
-            ...(Name || Name === null) && Name,
+            ...(Name || Name === null) && {Name},
             ...(Description || Description === null) && {Description},
             ...AttachmentUrl && {AttachmentUrl},
             ...MessageUuid && {MessageUuid},
@@ -62,7 +62,7 @@ const updateOne = async (req, res, next) => {
         if (!AttachmentUrl) return next(new HttpException(400, 'Invalid attachment file'))
         const attachment = await Attachment.update({
             Uuid: crypto.randomUUID(),
-            ...(Name || Name === null) && Name,
+            ...(Name || Name === null) && {Name},
             ...(Description || Description === null) && {Description},
             ...AttachmentUrl && {AttachmentUrl},
             ...MessageUuid && {MessageUuid},
