@@ -30,10 +30,16 @@ const getOne = async (req, res, next) => {
 
 const createOne = async (req, res, next) => {
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
-    const { Message } = req.body
+    const { Message, UserUuid, Username, Role, Super, Permission, Level } = req.body
     try {
         const log = await Log.create({
             ...Message && Message,
+            ...UserUuid && UserUuid,
+            ...Username && Username,
+            ...Role && Role,
+            ...Super && Super,
+            ...Permission && Permission,
+            ...Level && Level,
         })
         return res.status(200).json(log)
     } catch (e) {
@@ -45,10 +51,16 @@ const updateOne = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
-    const { Message } = req.body
+    const { Message, UserUuid, Username, Role, Super, Permission, Level } = req.body
     try {
         const log = await Log.update({
             ...Message && Message,
+            ...UserUuid && UserUuid,
+            ...Username && Username,
+            ...Role && Role,
+            ...Super && Super,
+            ...Permission && Permission,
+            ...Level && Level,
         }, {
             where: {
                 Uuid: id,

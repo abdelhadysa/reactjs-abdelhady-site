@@ -8,7 +8,7 @@ const Log = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			// define association here
+			Log.belongsTo(models.User, { foreignKey: { onDelete: 'SET NULL', onUpdate: 'SET NULL', name: 'UserUuid', allowNull: true } })
 		}
 	}
 	Log.init({
@@ -24,8 +24,14 @@ const Log = (sequelize, DataTypes) => {
 			validate: {
 				notEmpty: true,
 			},
-		}
-	}, {
+		},
+		UserUuid: DataTypes.UUID,
+		Username: DataTypes.STRING,
+		Role: DataTypes.STRING,
+		Super: DataTypes.STRING,
+		Permission: DataTypes.STRING,
+		Level: DataTypes.STRING,
+}, {
 		sequelize,
 		modelName: 'Log',
 		createdAt: 'CreatedAt',

@@ -12,6 +12,22 @@ module.exports = {
 				type: Sequelize.STRING,
 				allowNull: false,
 			},
+			UserUuid: {
+				type: Sequelize.UUID,
+				allowNull: true,
+				references: {
+					model: 'Users',
+					key: 'Uuid',
+					as: 'UserUuid',
+				},
+				onDelete: 'SET NULL',
+				onUpdate: 'SET NULL',
+			},
+			Username: Sequelize.STRING,
+			Role: Sequelize.STRING,
+			Super: Sequelize.STRING,
+			Permission: Sequelize.STRING,
+			Level: Sequelize.STRING,
 			CreatedAt: {
 				allowNull: false,
 				type: Sequelize.DATE
