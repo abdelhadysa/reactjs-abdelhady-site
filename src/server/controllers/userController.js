@@ -281,21 +281,25 @@ const deletePost = async (req, res, next) => {
     const { id, postId } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     try {
+        const t = await sequelize.transaction()
         const user = await User.findOne({
             where: {
                 Uuid: id,
-            }
+            }, transaction: t
         })
         if (!user) throw new Error('User not found')
         const post = await Post.findOne({
             where: {
                 Uuid: postId,
-            }
+            }, transaction: t
         })
         if(!post) throw new Error('Post not found')
-        const result = await post.destroy()
+        const result = await post.destroy({ transaction: t })
+        await Message.destroy({ where: { Uuid: post.MessageUuid }, transaction: t })
+        await t.commit()
         return res.status(200).json(result)
     } catch(e) {
+        await t.rollback()
         return next(new HttpException(500, e))
     }
 }
@@ -484,6 +488,7 @@ const deleteReply = async (req, res, next) => {
             }
         }
         const result = await reply.destroy({ transaction: t })
+        await Message.destroy({ where: { Uuid: reply.MessageUuid }, transaction: t })
         await t.commit()
         return res.status(200).json(result)
     } catch(e) {

@@ -191,13 +191,17 @@ const deletePost = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
     try {
+        const t = await sequelize.transaction()
         const post = await Post.destroy({
             where: {
                 MessageUuid: id,
-            }
+            }, transaction: t
         })
+        await Message.destroy({ where: { Uuid: id }, transaction: t })
+        await t.commit()
         return res.status(200).json(post)
     } catch (e) {
+        await t.rollback()
         return next(new HttpException(500, e))
     }
 }
@@ -329,6 +333,7 @@ const deleteReply = async (req, res, next) => {
             }
         }
         const result = await reply.destroy({ transaction: t })
+        await Message.destroy({ where: { Uuid: id }, transaction: t })
         await t.commit()
         return res.status(200).json(result)
     } catch (e) {
