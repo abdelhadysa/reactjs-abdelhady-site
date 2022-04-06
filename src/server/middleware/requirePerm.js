@@ -12,7 +12,7 @@ import models from 'Database/sequelize-models'
 import HttpException from '../utils/HttpException'
 import isUuid from '../utils/isUuid'
 
-const { User, Permission } = models
+const { User, Permission, Log } = models
 
 const requirePerm = (permNeeded) => {
     return async (req, res, next) => {
@@ -47,7 +47,18 @@ const requirePerm = (permNeeded) => {
                 }
             }
             if (req.authorized === true) {
-                console.log(`Authorized User ${user.Username} with Role ${req.roleOfAuthority} (Super: ${req.superAccess}) and Permission ${req.permissionNeeded}`)
+                const message = `Authorized User ${user.Username} with Role ${req.roleOfAuthority} (Super: ${req.superAccess}) and Permission ${req.permissionNeeded}`
+                console.log(message)
+                await Log.create({
+                    Message: `Requested permission to access ${req.originalUrl}`,
+                    UserUuid: user.Uuid,
+                    Username: user.Username,
+                    Role: req.roleOfAuthority,
+                    Super: req.superAccess,
+                    Permission: req.permissionNeeded,
+                    Level: 'INFO',
+                    IpAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+                })
                 return next()
             } else return next(new HttpException(401, 'User not allowed to access this resource'))
         } catch(e) {

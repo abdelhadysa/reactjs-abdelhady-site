@@ -37,7 +37,7 @@ const refreshJWT = async (req, res, next) => {
 
         // Update User Meta Data
         User.update({
-            IpAddress: req.ip,
+            IpAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
             Device: req.device.type.charAt(0).toUpperCase() + req.device.type.slice(1),
             LastVisit: new Date(),
         }, {

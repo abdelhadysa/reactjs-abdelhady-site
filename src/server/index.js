@@ -19,6 +19,7 @@ const fs = require('fs')
 const React = require('react')
 const ReactDOMServer = require('react-dom/server')
 const cookieParser = require('cookie-parser')
+const rfs = require('rotating-file-stream')
 
 /* SSR */
 
@@ -76,12 +77,19 @@ const limiter = rateLimit({
     message: 'Client sent too many requests. Please try again later.',
 })
 
+// Rotating log
+
+const logStream = rfs.createStream('api.log', {
+    interval: '1d',
+    path: path.join(__dirname, 'log')
+})
+
 /* Create App Instance */
 
 const app = express()
 
 app
-    .use(morgan('common'))
+    .use(morgan('common', { stream: logStream }))
     .use(helmet())
     .use(cors(corsOptions))
     .use(limiter)
