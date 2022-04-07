@@ -29,7 +29,7 @@ const getOne = async (req, res, next) => {
             }, List, {
                 model: View,
                 include: User
-            }]
+            }, Attachment]
         })
         if (!message) return next(new HttpException(404, 'Message not found'))
         // Add view
