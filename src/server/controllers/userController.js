@@ -331,6 +331,9 @@ const deletePost = async (req, res, next) => {
             }, transaction: t
         })
         if(!post) throw new Error('Post not found')
+        const replies = await post.countReplies({ transaction: t })
+        const children = await post.countChildren({ transaction: t })
+        if (replies > 0 || children > 0) return next(new HttpException(403, 'Post associated with replies or children'))
         await post.destroy({ transaction: t })
         const attachments = await Attachment.findAll({
             where: {
