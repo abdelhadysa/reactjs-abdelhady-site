@@ -113,8 +113,8 @@ const deleteOne = async (req, res, next) => {
                 await unlink(attachment.AttachmentUrl)
             }
         }
-        const result = await message.destroy({ transaction: t })
-        await t.commit()
+        await message.destroy({ transaction: t })
+        const result = await t.commit()
         return res.status(200).json(result)
     } catch (e) {
         await t.rollback()
@@ -194,13 +194,9 @@ const updatePost = async (req, res, next) => {
             }
         })
         if (!post) return next(new HttpException(404, 'No post found for this message'))
-        const result = await Post.update({
+        const result = await post.update({
             ...Locked && {Locked},
             ...Pinned && {Pinned},
-        }, {
-            where: {
-                MessageUuid: id,
-            }
         })
         return res.status(200).json(result)
     } catch (e) {
@@ -213,11 +209,15 @@ const deletePost = async (req, res, next) => {
     const { id } = req.params
     const t = await sequelize.transaction()
     try {
-        const post = await Post.destroy({
+        const post = await Post.findOne({
             where: {
                 MessageUuid: id,
             }, transaction: t
         })
+        const replies = await post.countReplies({ transaction: t })
+        const children = await post.countChildren({ transaction: t })
+        if (replies > 0 || children > 0) return next(new HttpException(403, 'Post associated with replies or children'))
+        await post.destroy({ transaction: t })
         const attachments = await Attachment.findAll({
             where: {
                 MessageUuid: id,
@@ -230,8 +230,8 @@ const deletePost = async (req, res, next) => {
             }
         }
         await Message.destroy({ where: { Uuid: id }, transaction: t })
-        await t.commit()
-        return res.status(200).json(post)
+        const result = await t.commit()
+        return res.status(200).json(result)
     } catch (e) {
         await t.rollback()
         return next(new HttpException(500, e))
@@ -326,12 +326,12 @@ const updateReply = async (req, res, next) => {
                 }
             }
         }
-        const result = await reply.update({
+        await reply.update({
             ...ReplyingTo && ReplyingTo,
             ...ReplyingToUuid && ReplyingToUuid,
             ...PostUuid && PostUuid,
         }, { transaction: t })
-        await t.commit()
+        const result = await t.commit()
         return res.status(200).json(result)
     } catch (e) {
         await t.rollback()
@@ -364,7 +364,7 @@ const deleteReply = async (req, res, next) => {
                 }, { transaction: t })
             }
         }
-        const result = await reply.destroy({ transaction: t })
+        await reply.destroy({ transaction: t })
         const attachments = await Attachment.findAll({
             where: {
                 MessageUuid: id,
@@ -377,7 +377,7 @@ const deleteReply = async (req, res, next) => {
             }
         }
         await Message.destroy({ where: { Uuid: id }, transaction: t })
-        await t.commit()
+        const result = await t.commit()
         return res.status(200).json(result)
     } catch (e) {
         await t.rollback()

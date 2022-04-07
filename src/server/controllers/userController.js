@@ -117,24 +117,26 @@ const updateOne = async (req, res, next) => {
     const { id } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     const AvatarUrl = req.file !== undefined ? req.file.path : undefined
+    const t = await sequelize.transaction()
     try {
         const PasswordHash = Password ? await hashPass(Password) : undefined
         const user = await User.findOne({
             where: {
                 Uuid: id,
-            }
+            }, transaction: t
         })
         if (!user) return next(new HttpException(404, 'User not found'))
         const oldUrl = user.AvatarUrl
-        const result = await user.update({
+        await user.update({
             ...Username && {Username},
             ...PasswordHash && {PasswordHash},
             ...(Email || Email === null) && {Email},
             ...(AvatarUrl || AvatarUrl === null) && {AvatarUrl},
-        })
+        }, { transaction: t })
         if (AvatarUrl && oldUrl) {
             await unlink(oldUrl)
         }
+        const result = await t.commit()
         return res.status(200).json(result)
     } catch(e) {
         if (req.file) {
@@ -142,6 +144,7 @@ const updateOne = async (req, res, next) => {
             const filePath = file.path
             await unlink(filePath)
         }
+        await t.rollback()
         return next(new HttpException(500, e))
     }
 }
@@ -216,7 +219,7 @@ const createPost = async (req, res, next) => {
             Title,
             Text
         }, { transaction: t })
-        const post = await Post.create({
+        await Post.create({
             Uuid: crypto.randomUUID(),
             AuthorUuid: user.Uuid,
             LastEditorUuid: null,
@@ -235,8 +238,8 @@ const createPost = async (req, res, next) => {
                 }, { transaction: t })
             }
         }
-        await t.commit()
-        return res.status(200).json(post)
+        const result = await t.commit()
+        return res.status(200).json(result)
     } catch(e) {
         if (req.files && req.files.length) {
             for (const file of req.files) {
@@ -270,7 +273,7 @@ const updatePost = async (req, res, next) => {
             }, transaction: t
         })
         if(!post) throw new Error('Post not found')
-        const result = await Message.update({
+        await Message.update({
             ...Title && {Title},
             ...Text && {Text},
         }, { 
@@ -280,8 +283,8 @@ const updatePost = async (req, res, next) => {
          })
         await post.setPostLastEditor(user.Uuid, { transaction: t })
         if (req.files && req.files.length) {
-            const message = await post.getMessage()
-            const attachments = await message.countAttachments()
+            const message = await post.getMessage({ transaction: t })
+            const attachments = await message.countAttachments({ transaction: t })
             if (attachments >= D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Message has too many attachments')
             const totalAttachments = req.files.length + attachments
             if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error(`Exceeding the maximum allowed attachments by ${totalAttachments - D_DEFAULT_MAX_ATTACHMENTS}`)
@@ -295,7 +298,7 @@ const updatePost = async (req, res, next) => {
                 }, { transaction: t })
             }
         }
-        await t.commit()
+        const result = await t.commit()
         return res.status(200).json(result)
     } catch(e) {
         if (req.files && req.files.length) {
@@ -328,7 +331,7 @@ const deletePost = async (req, res, next) => {
             }, transaction: t
         })
         if(!post) throw new Error('Post not found')
-        const result = await post.destroy({ transaction: t })
+        await post.destroy({ transaction: t })
         const attachments = await Attachment.findAll({
             where: {
                 MessageUuid: post.MessageUuid,
@@ -341,7 +344,7 @@ const deletePost = async (req, res, next) => {
             }
         }
         await Message.destroy({ where: { Uuid: post.MessageUuid }, transaction: t })
-        await t.commit()
+        const result = await t.commit()
         return res.status(200).json(result)
     } catch(e) {
         await t.rollback()
@@ -419,7 +422,7 @@ const createReply = async (req, res, next) => {
             Title,
             Text
         }, { transaction: t })
-        const reply = await Reply.create({
+        await Reply.create({
             Uuid: crypto.randomUUID(),
             AuthorUuid: user.Uuid,
             LastEditorUuid: null,
@@ -439,8 +442,8 @@ const createReply = async (req, res, next) => {
                 }, { transaction: t })
             }
         }
-        await t.commit()
-        return res.status(200).json(reply)
+        const result = await t.commit()
+        return res.status(200).json(result)
     } catch(e) {
         if (req.files && req.files.length) {
             for (const file of req.files) {
@@ -474,7 +477,7 @@ const updateReply = async (req, res, next) => {
             }, transaction: t
         })
         if(!reply) throw new Error('Reply not found')
-        const result = await Message.update({
+        await Message.update({
             ...Title && {Title},
             ...Text && {Text},
         }, { 
@@ -484,8 +487,8 @@ const updateReply = async (req, res, next) => {
         })
         await reply.setReplyLastEditor(user.Uuid, { transaction: t })
         if (req.files && req.files.length) {
-            const message = await reply.getMessage()
-            const attachments = await message.countAttachments()
+            const message = await reply.getMessage({ transaction: t })
+            const attachments = await message.countAttachments({ transaction: t })
             if (attachments >= D_DEFAULT_MAX_ATTACHMENTS) throw new Error('Message has too many attachments')
             const totalAttachments = req.files.length + attachments
             if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error(`Exceeding the maximum allowed attachments by ${totalAttachments - D_DEFAULT_MAX_ATTACHMENTS}`)
@@ -499,7 +502,7 @@ const updateReply = async (req, res, next) => {
                 }, { transaction: t })
             }
         }
-        await t.commit()
+        const result = await t.commit()
         return res.status(200).json(result)
     } catch(e) {
         if (req.files && req.files.length) {
@@ -546,7 +549,7 @@ const deleteReply = async (req, res, next) => {
                 }, { transaction: t })
             }
         }
-        const result = await reply.destroy({ transaction: t })
+        await reply.destroy({ transaction: t })
         const attachments = await Attachment.findAll({
             where: {
                 MessageUuid: reply.MessageUuid,
@@ -559,7 +562,7 @@ const deleteReply = async (req, res, next) => {
             }
         }
         await Message.destroy({ where: { Uuid: reply.MessageUuid }, transaction: t })
-        await t.commit()
+        const result = await t.commit()
         return res.status(200).json(result)
     } catch(e) {
         await t.rollback()

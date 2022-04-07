@@ -63,25 +63,27 @@ const updateOne = async (req, res, next) => {
     const { id } = req.params
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
     const { Name, Description, MessageUuid, UserUuid } = req.body
+    const t = await sequelize.transaction()
     try {
         const AttachmentUrl = req.file !== undefined ? req.file.path : undefined
         //if (!AttachmentUrl) return next(new HttpException(400, 'Invalid attachment file'))
         const attachment = await Attachment.findOne({
             where: {
                 Uuid: id,
-            }
+            }, transaction: t
         })
         if (!attachment) return next(new HttpException(404, 'Attachment not found'))
         const oldUrl = attachment.AttachmentUrl
-        const result = await attachment.update({
+        await attachment.update({
             Uuid: crypto.randomUUID(),
             ...(Name || Name === null) && {Name},
             ...(Description || Description === null) && {Description},
             ...AttachmentUrl && {AttachmentUrl},
             ...MessageUuid && {MessageUuid},
             ...UserUuid && {UserUuid},
-        })
+        }, { transaction: t })
         AttachmentUrl && (await unlink(oldUrl))
+        const result = await t.commit()
         return res.status(200).json(result)
     } catch (e) {
         if (req.file) {
@@ -89,6 +91,7 @@ const updateOne = async (req, res, next) => {
             const filePath = file.path
             await unlink(filePath)
         }
+        await t.rollback()
         return next(new HttpException(500, e))
     }
 }
@@ -96,19 +99,22 @@ const updateOne = async (req, res, next) => {
 const deleteOne = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
+    const t = await sequelize.transaction()
     try {
         const attachment = await Attachment.findOne({
             where: {
                 Uuid: id,
-            }
+            }, transaction: t
         })
         if (!attachment) return next(new HttpException(404, 'Attachment not found'))
         if (attachment.UserUuid !== req.decodedJWTPayload.uuid && !req.superAccess) return next(new HttpException(403, 'You are not authorized to access this attachment'))
         const oldUrl = attachment.AttachmentUrl
-        const result = await attachment.destroy()
+        await attachment.destroy({ transaction: t })
         await unlink(oldUrl)
+        const result = t.commit()
         return res.status(200).json(result)
     } catch (e) {
+        await t.rollback()
         return next(new HttpException(500, e))
     }
 }
