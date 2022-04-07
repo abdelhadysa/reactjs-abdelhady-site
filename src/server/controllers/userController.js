@@ -318,8 +318,18 @@ const deletePost = async (req, res, next) => {
         })
         if(!post) throw new Error('Post not found')
         const result = await post.destroy({ transaction: t })
+        const attachments = await Attachment.findAll({
+            where: {
+                MessageUuid: post.MessageUuid,
+            }, transaction: t
+        })
         await Message.destroy({ where: { Uuid: post.MessageUuid }, transaction: t })
         await t.commit()
+        if (attachments.length) {
+            for (const attachment of attachments) {
+                await unlink(attachment.AttachmentUrl)
+            }
+        }
         return res.status(200).json(result)
     } catch(e) {
         await t.rollback()
@@ -525,8 +535,18 @@ const deleteReply = async (req, res, next) => {
             }
         }
         const result = await reply.destroy({ transaction: t })
+        const attachments = await Attachment.findAll({
+            where: {
+                MessageUuid: reply.MessageUuid,
+            }, transaction: t
+        })
         await Message.destroy({ where: { Uuid: reply.MessageUuid }, transaction: t })
         await t.commit()
+        if (attachments.length) {
+            for (const attachment of attachments) {
+                await unlink(attachment.AttachmentUrl)
+            }
+        }
         return res.status(200).json(result)
     } catch(e) {
         await t.rollback()
