@@ -156,6 +156,10 @@ const deleteOne = async (req, res, next) => {
             }
         })
         if (!user) return next(new HttpException(404, 'User not found'))
+        const posts = await user.countPosts()
+        const replies = await user.countReplies()
+        const attachments = await user.countAttachments()
+        if (posts > 0 || replies > 0 || attachments > 0) return next(new HttpException(403, 'User associated with a post, reply or an attachment'))
         const oldUrl = user.AvatarUrl
         const result = await user.destroy()
         oldUrl && (await unlink(oldUrl))

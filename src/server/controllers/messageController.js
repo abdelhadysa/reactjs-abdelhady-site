@@ -98,6 +98,10 @@ const deleteOne = async (req, res, next) => {
             }, transaction: t
         })
         if (!message) return next(new HttpException(404, 'Message not found'))
+        const post = await message.getPost({ transaction: t })
+        if (post) return next(new HttpException(403, 'Message associated with a post'))
+        const reply = await message.getReply({ transaction: t })
+        if (reply) return next(new HttpException(403, 'Message associated with a reply'))
         const attachments = await Attachment.findAll({
             where: {
                 MessageUuid: id,
