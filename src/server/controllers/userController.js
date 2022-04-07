@@ -116,7 +116,7 @@ const updateOne = async (req, res, next) => {
     const { Username, Password, Email } = req.body
     const { id } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
-    const AvatarUrl = req.file !== undefined ? req.file.filename : undefined
+    const AvatarUrl = req.file !== undefined ? req.file.path : undefined
     try {
         const PasswordHash = Password ? await hashPass(Password) : undefined
         const result = await User.update({
@@ -131,6 +131,11 @@ const updateOne = async (req, res, next) => {
         })
         return res.status(200).json(result)
     } catch(e) {
+        if (req.file) {
+            const { file } = req
+            const filePath = file.path
+            await unlink(filePath)
+        }
         return next(new HttpException(500, e))
     }
 }
@@ -139,11 +144,14 @@ const deleteOne = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
     try {
-        const result = await User.destroy({
+        const user = await User.findOne({
             where: {
                 Uuid: id,
             }
         })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        await unlink(user.AvatarUrl)
+        const result = await user.destroy()
         return res.status(200).json(result)
     } catch(e) {
         return next(new HttpException(500, e))
