@@ -90,26 +90,30 @@ const updateOne = async (req, res, next) => {
 const deleteOne = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
+    const t = await sequelize.transaction()
     try {
         const message = await Message.findOne({
             where: {
                 Uuid: id,
-            }
+            }, transaction: t
         })
         if (!message) return next(new HttpException(404, 'Message not found'))
         const attachments = await Attachment.findAll({
             where: {
                 MessageUuid: id,
-            }
+            }, transaction: t
         })
-        const result = await message.destroy()
         if (attachments.length) {
             for (const attachment of attachments) {
+                await attachment.destroy({ transaction: t })
                 await unlink(attachment.AttachmentUrl)
             }
         }
+        const result = await message.destroy({ transaction: t })
+        await t.commit()
         return res.status(200).json(result)
     } catch (e) {
+        await t.rollback()
         return next(new HttpException(500, e))
     }
 }
@@ -215,13 +219,14 @@ const deletePost = async (req, res, next) => {
                 MessageUuid: id,
             }, transaction: t
         })
-        await Message.destroy({ where: { Uuid: id }, transaction: t })
-        await t.commit()
         if (attachments.length) {
             for (const attachment of attachments) {
+                await attachment.destroy({ transaction: t })
                 await unlink(attachment.AttachmentUrl)
             }
         }
+        await Message.destroy({ where: { Uuid: id }, transaction: t })
+        await t.commit()
         return res.status(200).json(post)
     } catch (e) {
         await t.rollback()
@@ -361,13 +366,14 @@ const deleteReply = async (req, res, next) => {
                 MessageUuid: id,
             }, transaction: t
         })
-        await Message.destroy({ where: { Uuid: id }, transaction: t })
-        await t.commit()
         if (attachments.length) {
             for (const attachment of attachments) {
+                await attachment.destroy({ transaction: t })
                 await unlink(attachment.AttachmentUrl)
             }
         }
+        await Message.destroy({ where: { Uuid: id }, transaction: t })
+        await t.commit()
         return res.status(200).json(result)
     } catch (e) {
         await t.rollback()

@@ -72,6 +72,7 @@ const updateOne = async (req, res, next) => {
             }
         })
         if (!attachment) return next(new HttpException(404, 'Attachment not found'))
+        const oldUrl = attachment.AttachmentUrl
         const result = await attachment.update({
             Uuid: crypto.randomUUID(),
             ...(Name || Name === null) && {Name},
@@ -80,7 +81,7 @@ const updateOne = async (req, res, next) => {
             ...MessageUuid && {MessageUuid},
             ...UserUuid && {UserUuid},
         })
-        await unlink(attachment.AttachmentUrl)
+        await unlink(oldUrl)
         return res.status(200).json(result)
     } catch (e) {
         if (req.file) {
@@ -103,8 +104,9 @@ const deleteOne = async (req, res, next) => {
         })
         if (!attachment) return next(new HttpException(404, 'Attachment not found'))
         if (attachment.UserUuid !== req.decodedJWTPayload.uuid && !req.superAccess) return next(new HttpException(403, 'You are not authorized to access this attachment'))
-        await unlink(attachment.AttachmentUrl)
+        const oldUrl = attachment.AttachmentUrl
         const result = await attachment.destroy()
+        await unlink(oldUrl)
         return res.status(200).json(result)
     } catch (e) {
         return next(new HttpException(500, e))

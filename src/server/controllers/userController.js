@@ -119,16 +119,22 @@ const updateOne = async (req, res, next) => {
     const AvatarUrl = req.file !== undefined ? req.file.path : undefined
     try {
         const PasswordHash = Password ? await hashPass(Password) : undefined
-        const result = await User.update({
-            ...Username && {Username},
-            ...PasswordHash && {PasswordHash},
-            ...(Email || Email === null) && {Email},
-            ...(AvatarUrl || AvatarUrl === null) && {AvatarUrl},
-        }, {
+        const user = await User.findOne({
             where: {
                 Uuid: id,
             }
         })
+        if (!user) return next(new HttpException(404, 'User not found'))
+        const oldUrl = user.AvatarUrl
+        const result = await user.update({
+            ...Username && {Username},
+            ...PasswordHash && {PasswordHash},
+            ...(Email || Email === null) && {Email},
+            ...(AvatarUrl || AvatarUrl === null) && {AvatarUrl},
+        })
+        if (AvatarUrl && oldUrl) {
+            await unlink(oldUrl)
+        }
         return res.status(200).json(result)
     } catch(e) {
         if (req.file) {
@@ -150,8 +156,9 @@ const deleteOne = async (req, res, next) => {
             }
         })
         if (!user) return next(new HttpException(404, 'User not found'))
-        await unlink(user.AvatarUrl)
+        const oldUrl = user.AvatarUrl
         const result = await user.destroy()
+        oldUrl && (await unlink(oldUrl))
         return res.status(200).json(result)
     } catch(e) {
         return next(new HttpException(500, e))
@@ -323,13 +330,14 @@ const deletePost = async (req, res, next) => {
                 MessageUuid: post.MessageUuid,
             }, transaction: t
         })
-        await Message.destroy({ where: { Uuid: post.MessageUuid }, transaction: t })
-        await t.commit()
         if (attachments.length) {
             for (const attachment of attachments) {
+                await attachment.destroy({ transaction: t })
                 await unlink(attachment.AttachmentUrl)
             }
         }
+        await Message.destroy({ where: { Uuid: post.MessageUuid }, transaction: t })
+        await t.commit()
         return res.status(200).json(result)
     } catch(e) {
         await t.rollback()
@@ -540,13 +548,14 @@ const deleteReply = async (req, res, next) => {
                 MessageUuid: reply.MessageUuid,
             }, transaction: t
         })
-        await Message.destroy({ where: { Uuid: reply.MessageUuid }, transaction: t })
-        await t.commit()
         if (attachments.length) {
             for (const attachment of attachments) {
+                await attachment.destroy({ transaction: t })
                 await unlink(attachment.AttachmentUrl)
             }
         }
+        await Message.destroy({ where: { Uuid: reply.MessageUuid }, transaction: t })
+        await t.commit()
         return res.status(200).json(result)
     } catch(e) {
         await t.rollback()
