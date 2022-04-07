@@ -1,6 +1,7 @@
 import models, { sequelize } from 'Database/sequelize-models'
 import HttpException from '../utils/HttpException'
 import crypto from 'crypto'
+import { unlink } from 'fs/promises'
 
 const { Attachment } = models
 
@@ -36,7 +37,7 @@ const createOne = async (req, res, next) => {
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
     const { Name, Description, MessageUuid, UserUuid } = req.body
     try {
-        const AttachmentUrl = req.file !== undefined ? req.file.filename : undefined
+        const AttachmentUrl = req.file !== undefined ? req.file.path : undefined
         if (!AttachmentUrl) return next(new HttpException(400, 'Invalid attachment file'))
         const attachment = await Attachment.create({
             Uuid: crypto.randomUUID(),
@@ -48,6 +49,11 @@ const createOne = async (req, res, next) => {
         })
         return res.status(200).json(attachment)
     } catch (e) {
+        if (req.file) {
+            const { file } = req
+            const filePath = file.path
+            await unlink(filePath)
+        }
         return next(new HttpException(500, e))
     }
 }
@@ -58,7 +64,7 @@ const updateOne = async (req, res, next) => {
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
     const { Name, Description, MessageUuid, UserUuid } = req.body
     try {
-        const AttachmentUrl = req.file !== undefined ? req.file.filename : undefined
+        const AttachmentUrl = req.file !== undefined ? req.file.path : undefined
         if (!AttachmentUrl) return next(new HttpException(400, 'Invalid attachment file'))
         const attachment = await Attachment.update({
             Uuid: crypto.randomUUID(),
@@ -74,6 +80,11 @@ const updateOne = async (req, res, next) => {
         })
         return res.status(200).json(attachment)
     } catch (e) {
+        if (req.file) {
+            const { file } = req
+            const filePath = file.path
+            await unlink(filePath)
+        }
         return next(new HttpException(500, e))
     }
 }
@@ -89,11 +100,8 @@ const deleteOne = async (req, res, next) => {
         })
         if (!attachment) return next(new HttpException(404, 'Attachment not found'))
         if (attachment.UserUuid !== req.decodedJWTPayload.uuid && !req.superAccess) return next(new HttpException(403, 'You are not authorized to access this attachment'))
-        const result = await Attachment.destroy({
-            where: {
-                Uuid: id,
-            }
-        })
+        await unlink(attachment.AttachmentUrl)
+        const result = await attachment.destroy()
         return res.status(200).json(result)
     } catch (e) {
         return next(new HttpException(500, e))

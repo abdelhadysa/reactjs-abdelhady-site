@@ -3,6 +3,7 @@ import HttpException from '../utils/HttpException'
 import crypto from 'crypto'
 import { hashPass } from '../utils/bcryptManager'
 import { D_DEFAULT_MAX_ATTACHMENTS } from '../utils/defaults'
+import { unlink } from 'fs/promises'
 
 // User
 
@@ -207,9 +208,9 @@ const createPost = async (req, res, next) => {
         if (req.files && req.files.length) {
             for (const file of req.files) {
                 if(!file) continue
-                const fileName = file.filename
+                const filePath = file.path
                 await Attachment.create({
-                    AttachmentUrl: fileName,
+                    AttachmentUrl: filePath,
                     UserUuid: user.Uuid,
                     MessageUuid: message.Uuid,
                 }, { transaction: t })
@@ -218,6 +219,13 @@ const createPost = async (req, res, next) => {
         await t.commit()
         return res.status(200).json(post)
     } catch(e) {
+        if (req.files && req.files.length) {
+            for (const file of req.files) {
+                if (!file) continue
+                const filePath = file.path
+                await unlink(filePath)
+            }
+        }
         await t.rollback()
         return next(new HttpException(500, e))
     }
@@ -260,9 +268,9 @@ const updatePost = async (req, res, next) => {
             if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error(`Exceeding the maximum allowed attachments by ${totalAttachments - D_DEFAULT_MAX_ATTACHMENTS}`)
             for (const file of req.files) {
                 if(!file) continue
-                const fileName = file.filename
+                const filePath = file.path
                 await Attachment.create({
-                    AttachmentUrl: fileName,
+                    AttachmentUrl: filePath,
                     UserUuid: user.Uuid,
                     MessageUuid: post.MessageUuid,
                 }, { transaction: t })
@@ -271,6 +279,13 @@ const updatePost = async (req, res, next) => {
         await t.commit()
         return res.status(200).json(result)
     } catch(e) {
+        if (req.files && req.files.length) {
+            for (const file of req.files) {
+                if (!file) continue
+                const filePath = file.path
+                await unlink(filePath)
+            }
+        }
         await t.rollback()
         return next(new HttpException(500, e))
     }
@@ -386,9 +401,9 @@ const createReply = async (req, res, next) => {
         if (req.files && req.files.length) {
             for (const file of req.files) {
                 if(!file) continue
-                const fileName = file.filename
+                const filePath = file.path
                 await Attachment.create({
-                    AttachmentUrl: fileName,
+                    AttachmentUrl: filePath,
                     UserUuid: user.Uuid,
                     MessageUuid: message.Uuid,
                 }, { transaction: t })
@@ -397,6 +412,13 @@ const createReply = async (req, res, next) => {
         await t.commit()
         return res.status(200).json(reply)
     } catch(e) {
+        if (req.files && req.files.length) {
+            for (const file of req.files) {
+                if (!file) continue
+                const filePath = file.path
+                await unlink(filePath)
+            }
+        }
         await t.rollback()
         return next(new HttpException(500, e))
     }
@@ -439,9 +461,9 @@ const updateReply = async (req, res, next) => {
             if (totalAttachments > D_DEFAULT_MAX_ATTACHMENTS) throw new Error(`Exceeding the maximum allowed attachments by ${totalAttachments - D_DEFAULT_MAX_ATTACHMENTS}`)
             for (const file of req.files) {
                 if(!file) continue
-                const fileName = file.filename
+                const filePath = file.path
                 await Attachment.create({
-                    AttachmentUrl: fileName,
+                    AttachmentUrl: filePath,
                     UserUuid: user.Uuid,
                     MessageUuid: reply.MessageUuid,
                 }, { transaction: t })
@@ -450,6 +472,13 @@ const updateReply = async (req, res, next) => {
         await t.commit()
         return res.status(200).json(result)
     } catch(e) {
+        if (req.files && req.files.length) {
+            for (const file of req.files) {
+                if (!file) continue
+                const filePath = file.path
+                await unlink(filePath)
+            }
+        }
         await t.rollback()
         return next(new HttpException(500, e))
     }
