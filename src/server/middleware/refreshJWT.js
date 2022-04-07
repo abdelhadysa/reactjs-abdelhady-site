@@ -35,15 +35,19 @@ const refreshJWT = async (req, res, next) => {
         const unixTimestamp = Math.floor(Date.now() / 1000)
         // console.log(decoded.exp, unixTimestamp)
 
+        // Verify User
+        const user = await User.findOne({
+            where: {
+                Uuid: decoded.uuid,
+            },
+        })
+        if (!user) throw new Error('User not found')
+
         // Update User Meta Data
-        User.update({
+        await user.update({
             IpAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
             Device: req.device.type.charAt(0).toUpperCase() + req.device.type.slice(1),
             LastVisit: new Date(),
-        }, {
-            where: {
-                Uuid: decoded.uuid,
-            }
         })
 
         // Renewal Code
