@@ -81,7 +81,7 @@ const updateOne = async (req, res, next) => {
             ...MessageUuid && {MessageUuid},
             ...UserUuid && {UserUuid},
         })
-        await unlink(oldUrl)
+        AttachmentUrl && (await unlink(oldUrl))
         return res.status(200).json(result)
     } catch (e) {
         if (req.file) {
