@@ -65,7 +65,7 @@ const updateOne = async (req, res, next) => {
     const { Name, Description, MessageUuid, UserUuid } = req.body
     try {
         const AttachmentUrl = req.file !== undefined ? req.file.path : undefined
-        if (!AttachmentUrl) return next(new HttpException(400, 'Invalid attachment file'))
+        //if (!AttachmentUrl) return next(new HttpException(400, 'Invalid attachment file'))
         const attachment = await Attachment.update({
             Uuid: crypto.randomUUID(),
             ...(Name || Name === null) && {Name},
