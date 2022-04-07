@@ -66,19 +66,22 @@ const updateOne = async (req, res, next) => {
     try {
         const AttachmentUrl = req.file !== undefined ? req.file.path : undefined
         //if (!AttachmentUrl) return next(new HttpException(400, 'Invalid attachment file'))
-        const attachment = await Attachment.update({
+        const attachment = await Attachment.findOne({
+            where: {
+                Uuid: id,
+            }
+        })
+        if (!attachment) return next(new HttpException(404, 'Attachment not found'))
+        const result = await attachment.update({
             Uuid: crypto.randomUUID(),
             ...(Name || Name === null) && {Name},
             ...(Description || Description === null) && {Description},
             ...AttachmentUrl && {AttachmentUrl},
             ...MessageUuid && {MessageUuid},
             ...UserUuid && {UserUuid},
-        }, {
-            where: {
-                Uuid: id,
-            }
         })
-        return res.status(200).json(attachment)
+        await unlink(attachment.AttachmentUrl)
+        return res.status(200).json(result)
     } catch (e) {
         if (req.file) {
             const { file } = req
