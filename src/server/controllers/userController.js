@@ -303,8 +303,8 @@ const deletePost = async (req, res, next) => {
     if (!req.params.id || !req.params.postId) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id, postId } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const user = await User.findOne({
             where: {
                 Uuid: id,
@@ -506,8 +506,8 @@ const deleteReply = async (req, res, next) => {
     if (!req.params.id || !req.params.replyId) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id, replyId } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
+    const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const user = await User.findOne({
             where: {
                 Uuid: id,

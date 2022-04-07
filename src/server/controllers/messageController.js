@@ -203,8 +203,8 @@ const updatePost = async (req, res, next) => {
 const deletePost = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
+    const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const post = await Post.destroy({
             where: {
                 MessageUuid: id,
@@ -293,8 +293,8 @@ const updateReply = async (req, res, next) => {
     const { id } = req.params
     if (!req.body) return next(new HttpException(400, 'Missing request body'))
     const { ReplyingTo, ReplyingToUuid, PostUuid } = req.body
+    const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const reply = await Reply.findOne({
             where: {
                 MessageUuid: id,
@@ -333,8 +333,8 @@ const updateReply = async (req, res, next) => {
 const deleteReply = async (req, res, next) => {
     if (!req.params.id) return next(new HttpException(400, 'Missing ID in request parameter'))
     const { id } = req.params
+    const t = await sequelize.transaction()
     try {
-        const t = await sequelize.transaction()
         const reply = await Reply.findOne({
             where: {
                 MessageUuid: id,
