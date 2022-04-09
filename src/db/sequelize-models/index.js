@@ -1,28 +1,26 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const Sequelize = require('sequelize');
-const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require('../sequelize-config/config.js')[env];
+import Sequelize from'sequelize'
+import configObj from '../sequelize-config/config.js'
+import Engagement from './engagement.js'
+import Favorite from './favorite.js'
+import Grant from './grant.js'
+import List from './list.js'
+import Log from './log.js'
+import Message from './message.js'
+import Permission from './permission.js'
+import Post from './post.js'
+import Reply from './reply.js'
+import Right from './right.js'
+import Role from './role.js'
+import Tag from './tag.js'
+import User from './user.js'
+import Reaction from './reaction.js'
+import View from './view.js'
+import Attachment from './attachment.js'
 
-import Engagement from './engagement'
-import Favorite from './favorite'
-import Grant from './grant'
-import List from './list'
-import Log from './log'
-import Message from './message'
-import Permission from './permission'
-import Post from './post'
-import Reply from './reply'
-import Right from './right'
-import Role from './role'
-import Tag from './tag'
-import User from './user'
-import Reaction from './reaction'
-import View from './view'
-import Attachment from './attachment'
+const env = process.env.NODE_ENV || 'development'
+const config = configObj[env]
 
 let sequelize;
 if (config.use_env_variable) {
@@ -48,19 +46,7 @@ const models = {
 	Right: Right(sequelize, Sequelize.DataTypes),
 	View: View(sequelize, Sequelize.DataTypes),
 	Attachment: Attachment(sequelize, Sequelize.DataTypes),
-};
-
-//require.context(__dirname, false, /^((?!index).)*\.js$/)
-/*fs
-	.readdirSync(__dirname)
-	.filter(file => {
-		return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
-	})
-	.forEach(file => {
-		const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-		models[model.name] = model;
-	});
-*/
+}
 
 Object.keys(models).forEach(modelName => {
 	if (models[modelName].associate) {
