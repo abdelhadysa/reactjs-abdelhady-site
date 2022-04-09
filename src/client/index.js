@@ -10,7 +10,13 @@ import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom'
 import App from 'Components/App'
 import 'Styles/main.scss'
-import './i18n'
+import './i18n.js'
+import 'Resources/img/favicon/favicon.ico'
+import 'Resources/img/favicon/favicon-32x32.png'
+import 'Resources/img/favicon/favicon-16x16.png'
+import 'Resources/img/favicon/apple-touch-icon.png'
+import 'Resources/img/favicon/android-chrome-512x512.png'
+import 'Resources/img/favicon/android-chrome-192x192.png'
 
 const titleElement = document.createElement('title')
 const headElement = document.querySelector('head')
