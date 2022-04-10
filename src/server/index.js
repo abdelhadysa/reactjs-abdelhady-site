@@ -19,7 +19,7 @@ import fs from 'fs'
 import React from 'react'
 import * as ReactDOMServer from 'react-dom/server'
 import cookieParser from 'cookie-parser'
-import rfs from 'rotating-file-stream'
+import * as rfs from 'rotating-file-stream'
 
 /* SSR */
 
