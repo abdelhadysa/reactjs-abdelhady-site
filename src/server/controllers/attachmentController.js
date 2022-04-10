@@ -1,5 +1,5 @@
 import models, { sequelize } from 'Database/sequelize-models'
-import HttpException from '../utils/HttpException'
+import HttpException from '../utils/HttpException.js'
 import crypto from 'crypto'
 import { unlink } from 'fs/promises'
 

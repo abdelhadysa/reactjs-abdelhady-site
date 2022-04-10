@@ -1,5 +1,5 @@
 import models, { sequelize } from 'Database/sequelize-models'
-import HttpException from '../utils/HttpException'
+import HttpException from '../utils/HttpException.js'
 import { unlink } from 'fs/promises'
 
 const { Message, Post, Reply, Engagement, Reaction, List, Tag, User, View, Attachment } = models

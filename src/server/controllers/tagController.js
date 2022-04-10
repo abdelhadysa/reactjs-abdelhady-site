@@ -1,5 +1,5 @@
 import models, { sequelize } from 'Database/sequelize-models'
-import HttpException from '../utils/HttpException'
+import HttpException from '../utils/HttpException.js'
 const { Tag, List, Message } = models
 
 // Tag
