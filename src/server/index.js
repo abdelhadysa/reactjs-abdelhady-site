@@ -6,41 +6,41 @@
     License file is included in the root directory and has the name "LICENSE"
 */
 
-const path = require('path')
-const express = require('express')
-const dotenv = require('dotenv')
-const bodyParser = require('body-parser')
-const cors = require('cors')
-const morgan = require('morgan')
-const helmet = require('helmet')
-const rateLimit = require('express-rate-limit')
-const device = require('express-device')
-const fs = require('fs')
-const React = require('react')
-const ReactDOMServer = require('react-dom/server')
-const cookieParser = require('cookie-parser')
-const rfs = require('rotating-file-stream')
+import path from 'path'
+import express from 'express'
+import dotenv from 'dotenv'
+import bodyParser from 'body-parser'
+import cors from 'cors'
+import morgan from 'morgan'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
+import device from 'express-device'
+import fs from 'fs'
+import React from 'react'
+import * as ReactDOMServer from 'react-dom/server'
+import cookieParser from 'cookie-parser'
+import rfs from 'rotating-file-stream'
 
 /* SSR */
 
-import App from '../../src/client/components/App'
+import App from '../client/components/App.js'
 
 /* Routes */
 
-import apiRouter from './routes/apiRouter'
+import apiRouter from './routes/apiRouter.js'
 
 /* Middleware */
 
-import errorHandler from './middleware/errorHandler'
-import errorResponder from './middleware/errorResponder'
+import errorHandler from './middleware/errorHandler.js'
+import errorResponder from './middleware/errorResponder.js'
 
 /* Errors */
 
-import HttpException from './utils/HttpException'
+import HttpException from './utils/HttpException.js'
 
 /* ANSI Color Codes */
 
-import * as ansiEscapeColor from './utils/ansiEscapeColor'
+import * as ansiEscapeColor from './utils/ansiEscapeColor.js'
 
 /* Load Env */
 
