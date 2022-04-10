@@ -1,14 +1,12 @@
-import path, { dirname } from 'path'
-import webpack from 'webpack'
-import dotenv from 'dotenv'
-import { merge } from 'webpack-merge'
-import common from './webpack.common.js'
-import { fileURLToPath } from 'url';
+const path = require ('path')
+const webpack = require ('webpack')
+const dotenv = require ('dotenv')
+const { merge } = require ('webpack-merge')
+const common = require ('./webpack.common.js')
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
 dotenv.config()
 
-export default [merge(common.client, {
+module.exports = [merge(common.client, {
         mode: 'development',
         devtool: 'inline-source-map',
         stats: 'detailed',

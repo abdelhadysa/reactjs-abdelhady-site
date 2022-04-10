@@ -1,12 +1,10 @@
-import path, { dirname } from 'path'
-import webpack from 'webpack'
-import HtmlWebpackPlugin from 'html-webpack-plugin'
-import CopyWebpackPlugin from 'copy-webpack-plugin'
-import nodeExternals from 'webpack-node-externals'
-import dotenv from 'dotenv'
-import { fileURLToPath } from 'url';
+const path = require('path')
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const nodeExternals = require('webpack-node-externals')
+const dotenv = require('dotenv')
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
 dotenv.config()
 
 const client = {
@@ -112,4 +110,4 @@ const server = {
     },
 }
 
-export default { client, server }
+module.exports = { client, server }

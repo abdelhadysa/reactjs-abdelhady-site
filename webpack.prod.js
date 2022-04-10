@@ -1,16 +1,16 @@
-import path from 'path'
-import webpack from 'webpack'
-import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import TerserPlugin from 'terser-webpack-plugin'
-import CSSMinimizerPlugin from 'css-minimizer-webpack-plugin'
-import WorkboxPlugin from 'workbox-webpack-plugin'
-import dotenv from 'dotenv'
-import { merge } from 'webpack-merge'
-import common from './webpack.common.js'
+const path = require ('path')
+const webpack = require ('webpack')
+const MiniCssExtractPlugin = require ('mini-css-extract-plugin')
+const TerserPlugin = require ('terser-webpack-plugin')
+const CSSMinimizerPlugin = require ('css-minimizer-webpack-plugin')
+const WorkboxPlugin = require ('workbox-webpack-plugin')
+const dotenv = require ('dotenv')
+const { merge } = require ('webpack-merge')
+const common = require ('./webpack.common.js')
 
 dotenv.config()
 
-export default [merge(common.client, {
+module.exports = [merge(common.client, {
         mode: 'production',
         stats: true,
         plugins: [
