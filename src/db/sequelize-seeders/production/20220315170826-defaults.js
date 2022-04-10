@@ -1,6 +1,6 @@
 'use strict';
-import { hashPass } from '../../../server/utils/bcryptManager';
-const {
+import { hashPass } from '../../../server/utils/bcryptManager'
+import {
 	D_DEFAULT_USER_ROLE_NAME,
 	D_SUPER_USER_ROLE_NAME,
 	D_DEFAULT_USER_ACCOUNT_NAME,
@@ -15,8 +15,8 @@ const {
 	D_DEFAULT_PERM,
 	D_DEFAULT_REACTIONS,
 	D_ATTACHMENT_PERM,
-} = require('../../../server/utils/defaults')
-const crypto = require('crypto')
+} from '../../../server/utils/defaults'
+import crypto from 'crypto'
 module.exports = {
 	async up (queryInterface, Sequelize) {
 		const defaultPass = await hashPass(D_DEFAULT_USER_ACCOUNT_PASSWORD)
