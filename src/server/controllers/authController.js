@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import { accessToken } from '../index.js'
+import AccessToken from '../utils/AccessToken.js'
 import models, { sequelize } from 'Database/sequelize-models'
 import { Op } from 'sequelize'
 import HttpException from '../utils/HttpException.js'
@@ -12,6 +12,7 @@ const { User, Role, Grant } = models
 
 const register = async (req, res, next) => {
     try {
+        const accessToken = new AccessToken({})
         const { Username, Password, Email } = req.body
         if (!Username || Username.length < 3 || Username.length > 15) return next(new HttpException(400, 'Username should be from 3 to 15 characters'))
         if (!Password || Password.length < 8 || Password.length > 65) return next(new HttpException(400, 'Password should be from 8 to 65 characters'))
@@ -39,6 +40,7 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     try {
+        const accessToken = new AccessToken({})
         const { Username, Password } = req.body
         if (!Username) return next(new HttpException(400, 'No username specified'))
         if (!Password) return next(new HttpException(400, 'No password specified'))

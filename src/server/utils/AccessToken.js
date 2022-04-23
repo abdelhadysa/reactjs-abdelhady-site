@@ -5,9 +5,9 @@ import util from 'util'
 dotenv.config()
 
 class AccessToken {
-    constructor({ secret = null, expiresIn = null, refreshAfter = null, log = false }) {
+    constructor({ secret = null, expiresIn = null, refreshAfter = null, log = process.env.NODE_ENV === 'development' ? true : false }) {
         this.secret = (secret !== null) ? secret : process.env.JWT_SECRET
-        this.expiry = (expiresIn !== null) ? expiresIn : process.env.JWT_EXPIRY_SECONDS + ' seconds'
+        this.expiry = parseFloat((expiresIn !== null) ? expiresIn : process.env.JWT_EXPIRY_SECONDS)
         this.refreshAfter = Math.floor(new Date().getTime() / 1000) + parseFloat((refreshAfter !== null ? refreshAfter : process.env.JWT_REFRESH_AFTER))
         this.log = log
     }
@@ -57,8 +57,8 @@ class AccessToken {
     }).then((decoded) => new Promise((res, rej) => {
         const { sign } = this
         const timestamp = Math.floor(new Date().getTime() / 1000)
-        if (!(timestamp >= decoded.refreshAfter)) return rej(new Error(`${Number(decoded.refreshAfter - timestamp)} seconds left to be eligible for AccessToken refresh`))
-        res(sign(decoded.accessData))
+        if (decoded.refreshAfter > timestamp) return rej(new Error(`${Number(decoded.refreshAfter - timestamp)} seconds left to be eligible for AccessToken refresh`))
+        res(sign(decoded))
     }))
 }
 
