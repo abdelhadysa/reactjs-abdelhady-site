@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import accessToken from '../index.js'
+import { accessToken } from '../index.js'
 import models, { sequelize } from 'Database/sequelize-models'
 import { Op } from 'sequelize'
 import HttpException from '../utils/HttpException.js'

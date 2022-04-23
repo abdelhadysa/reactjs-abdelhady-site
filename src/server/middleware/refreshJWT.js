@@ -1,7 +1,7 @@
 // Ref: https://www.sohamkamani.com/nodejs/jwt-authentication/#:~:text=Verifying%20a%20JWT,the%20JWT%20is%20considered%20valid.
 
 import dotenv from 'dotenv'
-import accessToken from '../index.js'
+import { accessToken } from '../index.js'
 import HttpException from '../utils/HttpException.js'
 import jwt from 'jsonwebtoken'
 import models, { sequelize } from 'Database/sequelize-models'

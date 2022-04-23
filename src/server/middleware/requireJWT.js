@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import accessToken from '../index.js'
+import { accessToken } from '../index.js'
 import HttpException from '../utils/HttpException.js'
 import jwt from 'jsonwebtoken'
 
