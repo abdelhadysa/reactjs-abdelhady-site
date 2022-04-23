@@ -29,7 +29,7 @@ const register = async (req, res, next) => {
         }, { transaction: t })
         await t.commit()
         const newToken = await accessToken.sign({ uuid: user.Uuid })
-        res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true })
+        res.cookie('token', newToken, { maxAge: parseFloat(process.env.COOKIE_MAXAGE) * 1000, signed: true, httpOnly: true, sameSite: true })
         res.status(200).json({ success: true })
     } catch(e) {
         await t.rollback()
@@ -51,7 +51,7 @@ const login = async (req, res, next) => {
         const passwordHash = user.PasswordHash
         if (!await tryPass(Password, passwordHash)) return next(new HttpException(401, 'Bad password'))
         const newToken = await accessToken.sign({ uuid: user.Uuid })
-        res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true })
+        res.cookie('token', newToken, { maxAge: parseFloat(process.env.COOKIE_MAXAGE) * 1000, signed: true, httpOnly: true, sameSite: true })
         res.status(200).json({ success: true })
     } catch(e) {
         next(new HttpException(500, e))

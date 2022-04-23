@@ -43,7 +43,7 @@ const refreshJWT = async (req, res, next) => {
         // Renewal Code
         if (decoded.refreshAfter > timestamp) return next()
         const newToken = await accessToken.refresh(token) // Renew token
-        res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true }) // Renew cookie
+        res.cookie('token', newToken, { maxAge: parseFloat(process.env.COOKIE_MAXAGE) * 1000, signed: true, httpOnly: true, sameSite: true }) // Renew cookie
         return next()
     } catch (e) { 
         res.clearCookie('token')

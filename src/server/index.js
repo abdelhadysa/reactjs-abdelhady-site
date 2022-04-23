@@ -102,7 +102,7 @@ app
     .use(bodyParser.json())
     .use(cookieParser(process.env.COOKIEPARSER_SECRET, {
         httpOnly: true,
-        maxAge: process.env.COOKIE_MAXAGE,
+        maxAge: parseFloat(process.env.COOKIE_MAXAGE),
         sameSite: true,
     }))
     .use(express.static(path.resolve('dist')))

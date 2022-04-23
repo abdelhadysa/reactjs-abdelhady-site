@@ -7,7 +7,7 @@ export const D_DEFAULT_USER_ACCOUNT_NAME = 'Abdelhady'
 export const D_DEFAULT_USER_ACCOUNT_PASSWORD = '123'
 export const D_DEFAULT_AVATAR_PATH = process.env.AVATAR_STORAGE_PATH
 export const D_DEFAULT_ATTACHMENTS_PATH = process.env.ATTACHMENTS_STORAGE_PATH
-export const D_DEFAULT_MAX_ATTACHMENTS = process.env.MAX_ATTACHMENTS
+export const D_DEFAULT_MAX_ATTACHMENTS = parseFloat(process.env.MAX_ATTACHMENTS)
 
 export const D_USER_PERM = {
     GET_ALL: 'GET_ALL_USERS',
