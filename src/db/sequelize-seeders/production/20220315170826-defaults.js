@@ -1,5 +1,5 @@
 'use strict';
-import { hashPass } from '../../../server/utils/bcryptManager'
+import { hashPass } from '../../../server/utils/BcryptManager.js'
 import {
 	D_DEFAULT_USER_ROLE_NAME,
 	D_SUPER_USER_ROLE_NAME,

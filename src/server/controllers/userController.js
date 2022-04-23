@@ -1,7 +1,7 @@
 import models, { sequelize } from 'Database/sequelize-models'
 import HttpException from '../utils/HttpException.js'
 import crypto from 'crypto'
-import { hashPass } from '../utils/bcryptManager.js'
+import { hashPass } from '../utils/BcryptManager.js'
 import { D_DEFAULT_MAX_ATTACHMENTS } from '../utils/defaults.js'
 import { unlink } from 'fs/promises'
 

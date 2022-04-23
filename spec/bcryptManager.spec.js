@@ -1,4 +1,4 @@
-import { hashPass, tryPass } from '../src/server/utils/bcryptManager.js'
+import { hashPass, tryPass } from '../src/server/utils/BcryptManager.js'
 describe('A Bcrypt Manager', () => {
     it('can hash a string and return it', async () => {
         const hash = await hashPass('Some cool pass')

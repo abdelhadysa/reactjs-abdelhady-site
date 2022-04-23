@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt'
+import dotenv from 'dotenv'
 
-const saltRounds = 10
+dotenv.config()
 
 const hashPass = (str) => new Promise((res, rej) => {
+    const saltRounds = parseFloat(process.env.SALT_ROUNDS) || 10
     bcrypt.hash(str, saltRounds, (err, hash) => err ? rej(err) : res(hash))
 })
 

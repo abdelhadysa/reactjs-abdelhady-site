@@ -3,7 +3,7 @@ import accessToken from '../index.js'
 import models, { sequelize } from 'Database/sequelize-models'
 import { Op } from 'sequelize'
 import HttpException from '../utils/HttpException.js'
-import { hashPass, tryPass } from '../utils/bcryptManager.js'
+import { hashPass, tryPass } from '../utils/BcryptManager.js'
 //import isUuid from '../utils/isUuid'
 
 dotenv.config()
