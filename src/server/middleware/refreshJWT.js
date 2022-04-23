@@ -23,6 +23,7 @@ const refreshJWT = async (req, res, next) => {
     if (!token || token === 'undefined') return next() // If token cookie doesn't exist, skip refresh process
     try {
         const decoded = await accessToken.verify({ token, decode: true }) // Verify and decode the JWT token
+        const timestamp = Math.floor(new Date().getTime() / 1000)
 
         // Verify User
         const user = await User.findOne({
@@ -40,6 +41,7 @@ const refreshJWT = async (req, res, next) => {
         })
 
         // Renewal Code
+        if (decoded.refreshAfter > timestamp) return next()
         const newToken = await accessToken.refresh(token) // Renew token
         res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true }) // Renew cookie
         return next()
