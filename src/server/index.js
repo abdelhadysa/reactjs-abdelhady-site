@@ -51,6 +51,11 @@ dotenv.config()
 
 import { sequelize } from 'Database/sequelize-models'
 
+/* Import Access Token */
+
+import AccessToken from './utils/AccessToken.js'
+export const accessToken = new AccessToken({ log: process.env.NODE_ENV === 'development' ? true : false })
+
 /* Whitelist */
 
 // Ref: https://blog.logrocket.com/express-middleware-a-complete-guide/

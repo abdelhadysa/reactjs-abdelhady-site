@@ -1,6 +1,5 @@
 import dotenv from 'dotenv'
-//import verifyJWT from '../utils/verifyJWT.js'
-import signJWT from '../utils/signJWT.js'
+import accessToken from '../index.js'
 import models, { sequelize } from 'Database/sequelize-models'
 import { Op } from 'sequelize'
 import HttpException from '../utils/HttpException.js'
@@ -29,7 +28,7 @@ const register = async (req, res, next) => {
             RoleUuid: userRole.Uuid,
         }, { transaction: t })
         await t.commit()
-        const newToken = await signJWT({ uuid: user.Uuid })
+        const newToken = await accessToken.sign({ uuid: user.Uuid })
         res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true })
         res.status(200).json({ success: true })
     } catch(e) {
@@ -51,7 +50,7 @@ const login = async (req, res, next) => {
         if (!user) return next(new HttpException(404, 'User not found'))
         const passwordHash = user.PasswordHash
         if (!await tryPass(Password, passwordHash)) return next(new HttpException(401, 'Bad password'))
-        const newToken = await signJWT({ uuid: user.Uuid })
+        const newToken = await accessToken.sign({ uuid: user.Uuid })
         res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true })
         res.status(200).json({ success: true })
     } catch(e) {

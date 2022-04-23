@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import verifyJWT from '../utils/verifyJWT.js'
+import accessToken from '../index.js'
 import HttpException from '../utils/HttpException.js'
 import jwt from 'jsonwebtoken'
 
@@ -8,7 +8,7 @@ dotenv.config()
 const requireJWT = (req, _res, next) => {
     const token = req.signedCookies.token
     if (!token || token === 'undefined') return next(new HttpException(401, 'Access to restricted resource without token'))
-    verifyJWT(token)
+    accessToken.verify({ token, decode: true })
     .then((_decoded) => {
         req.jwtToken = token
         req.decodedJWTPayload = _decoded

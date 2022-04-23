@@ -1,8 +1,7 @@
 // Ref: https://www.sohamkamani.com/nodejs/jwt-authentication/#:~:text=Verifying%20a%20JWT,the%20JWT%20is%20considered%20valid.
 
 import dotenv from 'dotenv'
-import verifyJWT from '../utils/verifyJWT.js'
-import signJWT from '../utils/signJWT.js'
+import accessToken from '../index.js'
 import HttpException from '../utils/HttpException.js'
 import jwt from 'jsonwebtoken'
 import models, { sequelize } from 'Database/sequelize-models'
@@ -23,9 +22,7 @@ const refreshJWT = async (req, res, next) => {
     const token = req.signedCookies.token
     if (!token || token === 'undefined') return next() // If token cookie doesn't exist, skip refresh process
     try {
-        const decoded = await verifyJWT(token) // Verify and decode the JWT token
-        const unixTimestamp = Math.floor(Date.now() / 1000)
-        // console.log(decoded.exp, unixTimestamp)
+        const decoded = await accessToken.verify({ token, decode: true }) // Verify and decode the JWT token
 
         // Verify User
         const user = await User.findOne({
@@ -43,9 +40,7 @@ const refreshJWT = async (req, res, next) => {
         })
 
         // Renewal Code
-        if (decoded.exp - unixTimestamp > process.env.JWT_REFRESHIN) return next()
-        const { uuid } = decoded
-        const newToken = await signJWT({ uuid }) // Renew token
+        const newToken = await accessToken.refresh(token) // Renew token
         res.cookie('token', newToken, { maxAge: process.env.COOKIE_MAXAGE * 1000, signed: true, httpOnly: true, sameSite: true }) // Renew cookie
         return next()
     } catch (e) { 
