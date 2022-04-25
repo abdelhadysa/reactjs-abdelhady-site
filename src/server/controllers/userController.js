@@ -745,9 +745,9 @@ const createTag = async (req, res, next) => {
             }
         })
         if (!user) return next(new HttpException(404, 'User not found'))
-        const hasTag = await User.hasTag(tagId)
+        const hasTag = await user.hasTag(tagId)
         if (hasTag) return next(new HttpException(400, 'User tag already exists'))
-        const addTag = await User.addTag(tagId)
+        const addTag = await user.addTag(tagId)
         return res.status(200).json(addTag)
     } catch(e) {
         return next(new HttpException(500, e))
@@ -765,9 +765,9 @@ const deleteTag = async (req, res, next) => {
             }
         })
         if (!user) return next(new HttpException(404, 'User not found'))
-        const hasTag = await User.hasTag(tagId)
+        const hasTag = await user.hasTag(tagId)
         if (!hasTag) return next(new HttpException(400, 'User tag not found'))
-        const removeTag = await User.removeTag(tagId)
+        const removeTag = await user.removeTag(tagId)
         return res.status(200).json(removeTag)
     } catch(e) {
         return next(new HttpException(500, e))
