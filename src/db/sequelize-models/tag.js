@@ -13,6 +13,9 @@ const Tag = (sequelize, DataTypes) => {
 
 			// List
 			Tag.hasMany(models.List, { foreignKey: { name: 'TagUuid', allowNull: false } })
+
+			// User
+			Tag.belongsToMany(models.User, { through: models.Favorite })
 		}
 	}
 	Tag.init({

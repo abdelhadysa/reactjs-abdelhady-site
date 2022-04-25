@@ -33,6 +33,9 @@ const User = (sequelize, DataTypes) => {
 
 			// Attachment
 			User.hasMany(models.Attachment, { foreignKey: { name: 'UserUuid', allowNull: false } })
+
+			// Tag
+			User.belongsToMany(models.Tag, { through: models.Favorite })
 		}
 	}
 	User.init({
