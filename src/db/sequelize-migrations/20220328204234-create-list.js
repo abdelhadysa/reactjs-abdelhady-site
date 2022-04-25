@@ -7,21 +7,6 @@ export default {
 				defaultValue: Sequelize.UUIDV4,
 				primaryKey: true,
 			},
-			Name: {
-				type: Sequelize.STRING,
-				unique: true,
-				allowNull: false,
-			},
-			Order: {
-				type: Sequelize.INTEGER,
-				allowNull: false,
-				defaultValue: 0,
-			},
-			Color: {
-				type: Sequelize.STRING,
-				allowNull: false,
-				defaultValue: '#000000',
-			},
 			MessageUuid: {
 				type: Sequelize.UUID,
 				allowNull: false,

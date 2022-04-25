@@ -21,29 +21,6 @@ const List = (sequelize, DataTypes) => {
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
 		},
-		Name: {
-			type: DataTypes.STRING,
-			unique: true,
-			allowNull: false,
-			validate: {
-				notEmpty: true,
-				is: /(^[A-Za-z0-9_\S ]+)/,
-			},
-		},
-		Order: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-			defaultValue: 0,
-		},
-		Color: {
-			type: DataTypes.STRING,
-			allowNull: false,
-			validate: {
-				notEmpty: true,
-				is: /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
-			},
-			defaultValue: '#000000',
-		},
 		MessageUuid: DataTypes.UUID,
 		TagUuid: DataTypes.UUID
 	}, {
