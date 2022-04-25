@@ -195,8 +195,8 @@ const updatePost = async (req, res, next) => {
         })
         if (!post) return next(new HttpException(404, 'No post found for this message'))
         const result = await post.update({
-            ...Locked && {Locked},
-            ...Pinned && {Pinned},
+            ...(Locked == true || Locked === false) && {Locked},
+            ...(Pinned == true || Pinned === false) && {Pinned},
         })
         return res.status(200).json(result)
     } catch (e) {
