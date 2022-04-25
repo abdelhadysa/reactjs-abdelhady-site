@@ -692,14 +692,14 @@ const deleteReaction = async (req, res, next) => {
     const { id, reactionId, messageId } = req.params
     if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     try {
-        const hasMessageReaction = await Engagement.findOne({
+        const messageReaction = await Engagement.findOne({
             where: {
                 UserUuid: id,
                 MessageUuid: messageId,
             }
         })
-        if (!hasMessageReaction) return next(new HttpException(400, 'User message reaction not found'))
-        const result = await Engagement.destroy({
+        if (!messageReaction) return next(new HttpException(400, 'User message reaction not found'))
+        const result = await messageReaction.destroy({
             UserUuid: id,
             ReactionUuid: reactionId,
             MessageUuid: messageId,
