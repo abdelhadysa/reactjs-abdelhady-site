@@ -586,7 +586,7 @@ const getRoles = async (req, res, next) => {
     const { id } = req.params
     //if (!req.superAccess && req.decodedJWTPayload.uuid !== id) return next(new HttpException(403, 'You do not have permission to update other users data'))
     try {
-        const user = await User.findAll({
+        const user = await User.findOne({
             where: {
                 Uuid: id,
             }
