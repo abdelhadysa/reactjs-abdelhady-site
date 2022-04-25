@@ -93,7 +93,7 @@ const User = (sequelize, DataTypes) => {
 		scopes: {
 			hideSensitive: {
 				attributes: {
-					exclude: ['PasswordHash'],
+					exclude: ['PasswordHash', 'Email', 'IpAddress', 'Device'],
 				},
 			},
 		},
