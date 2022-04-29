@@ -8,7 +8,7 @@
 
 import React from 'react'
 import { Col, Container, Row } from 'react-bootstrap'
-import CoverImage from 'Resources/img/branding/default.png'
+import CoverImage from 'Resources/img/branding/The Origami - Transparent Logo - Large.png'
 import { useTranslation } from 'react-i18next'
 import { DateTime } from 'luxon'
 import getGreetingTime from 'Client/utils/getGreetingTime'

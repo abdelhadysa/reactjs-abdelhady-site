@@ -1,7 +1,7 @@
 {
-  "name": "reactjs-abdelhady-site",
+  "name": "origami",
   "version": "1.0.0",
-  "description": "Abdelhady's Personal Site",
+  "description": "Origami - A Simple Platform for Discussions.",
   "main": "./dist/server.bundle.js",
   "scripts": {
     "test": "jasmine",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abdelhadysa1/reactjs-abdelhady-site.git"
+    "url": "git+https://github.com/abdelhadysa1/origami.git"
   },
   "keywords": [
     "abdelhady",
@@ -20,14 +20,16 @@
     "react",
     "js",
     "personal",
-    "website"
+    "website",
+    "origami",
+    "discussion"
   ],
   "author": "Abdelhady Salah",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/abdelhadysa1/reactjs-abdelhady-site/issues"
+    "url": "https://github.com/abdelhadysa1/origami/issues"
   },
-  "homepage": "https://github.com/abdelhadysa1/reactjs-abdelhady-site#readme",
+  "homepage": "https://github.com/abdelhadysa1/origami#readme",
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@babel/plugin-transform-runtime": "^7.17.0",
